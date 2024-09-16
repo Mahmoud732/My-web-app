@@ -1,0 +1,31 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Signup Page</title>
+    <link rel="stylesheet" href="{% static 'css/signup.css' %}">
+</head>
+<body>
+    <div class="signup-container">
+        <form class="signup-form">
+            <h2>Create Account</h2>
+            <div class="input-field">
+                <input type="text" id="name" placeholder="Full Name" required>
+            </div>
+            <div class="input-field">
+                <input type="email" id="email" placeholder="Email Address" required>
+            </div>
+            <div class="input-field">
+                <input type="password" id="password" placeholder="Password" required>
+            </div>
+            <div class="input-field">
+                <input type="password" id="confirm-password" placeholder="Confirm Password" required>
+            </div>
+            <button type="submit" class="btn">Sign Up</button>
+            <p>Already have an account? <a href="/login">Login</a></p>
+        </form>
+    </div>
+</body>
+</html>

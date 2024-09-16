@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Control Panel</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Admin Control Panel</h1>
+            <a href="{{ url_for('logout') }}" class="button logout">Logout</a>
+        </header>
+
+        <section class="countdown">
+            <h2>Time Until Midnight</h2>
+            <div id="time-counter">Loading...</div>
+        </section>
+
+        <button id="refresh-button" class="button refresh-users">Refresh Users</button>
+        <a href="{{ url_for('add_user') }}" class="button add-user">Add User</a>
+
+        <table id="users-table">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Username</th>
+                    <th>Password</th>
+                    <th>Start Date</th>
+                    <th>End Date</th>
+                    <th>Remaining Days</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- User rows will be dynamically populated here -->
+            </tbody>
+        </table>
+    </div>
+
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
+</body>
+</html>
