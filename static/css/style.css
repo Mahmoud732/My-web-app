@@ -96,13 +96,6 @@ body {
     text-decoration: underline;
 }
 
-/* Responsive Styles */
-@media (max-width: 500px) {
-    .login-container {
-        padding: 1.5rem;
-    }
-}
-
 /* Signup Styles */
 .signup-form h2 {
     text-align: center;
@@ -123,11 +116,4 @@ body {
 
 .signup-form p a:hover {
     text-decoration: underline;
-}
-
-/* Responsive Styles for Signup */
-@media (max-width: 500px) {
-    .signup-container {
-        padding: 1.5rem;
-    }
 }

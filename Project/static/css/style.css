@@ -80,6 +80,72 @@ body {
     background-color: #0056b3; /* Darker blue on hover */
 }
 
+/* Login Styles */
+.login-form h2 {
+    text-align: center;
+    margin-bottom: 1.5rem;
+    color: #333;
+}
+
+.input-field {
+    margin-bottom: 1.2rem;
+}
+
+.input-field input {
+    width: 100%;
+    padding: 0.8rem;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+    font-size: 1rem;
+    outline: none;
+    transition: border 0.3s;
+}
+
+.input-field input:focus {
+    border-color: #007bff;
+}
+
+.options {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 1.5rem;
+}
+
+.remember-me {
+    display: flex;
+    align-items: center;
+}
+
+.remember-me input {
+    margin-right: 0.4rem;
+}
+
+.forgot-password {
+    color: #007bff;
+    text-decoration: none;
+}
+
+.forgot-password:hover {
+    text-decoration: underline;
+}
+
+/* Button Styles */
+.btn {
+    width: 100%;
+    padding: 0.8rem;
+    background-color: #007bff; /* Blue background */
+    color: white; /* White text */
+    border: none;
+    border-radius: 5px;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.btn:hover {
+    background-color: #0056b3; /* Darker blue on hover */
+}
+
 /* Login Form Text */
 .login-form p {
     text-align: center;
@@ -96,14 +162,6 @@ body {
     text-decoration: underline;
 }
 
-/* Responsive Styles */
-@media (max-width: 500px) {
-    .login-container {
-        padding: 1.5rem;
-    }
-}
-
-/* Signup Styles */
 .signup-form h2 {
     text-align: center;
     margin-bottom: 1.5rem;
@@ -123,11 +181,4 @@ body {
 
 .signup-form p a:hover {
     text-decoration: underline;
-}
-
-/* Responsive Styles for Signup */
-@media (max-width: 500px) {
-    .signup-container {
-        padding: 1.5rem;
-    }
 }
