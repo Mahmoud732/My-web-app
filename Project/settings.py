@@ -33,6 +33,7 @@ ALLOWED_HOSTS = ['test-full-stack-app-344b29111c7c.herokuapp.com', 'localhost', 
 
 INSTALLED_APPS = [
     'app.apps.AppConfig',
+    'products.apps.ProductsConfig',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
