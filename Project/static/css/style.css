@@ -6,58 +6,61 @@
     font-family: 'Arial', sans-serif;
 }
 
-body, html {
-    height: 100%;
-    background-color: #f0f2f5;
-    color: #333;
+body {
     display: flex;
-    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    background-color: #f0f2f5;
 }
 
-/* Navbar Styles */
-.navbar {
-    background-color: #fff;
+/* Login Styles */
+.login-form h2 {
+    text-align: center;
+    margin-bottom: 1.5rem;
+    color: #333;
+}
+
+.input-field {
+    margin-bottom: 1.2rem;
+}
+
+.input-field input {
     width: 100%;
-    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
-    border-radius: 10px;
-    margin-bottom: 20px;
+    padding: 0.8rem;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+    font-size: 1rem;
+    outline: none;
+    transition: border 0.3s;
 }
 
-.navbar .container {
+.input-field input:focus {
+    border-color: #007bff;
+}
+
+.options {
     display: flex;
     justify-content: space-between;
-    align-items: center;
-    padding: 1rem;
+    margin-bottom: 1.5rem;
 }
 
-.brand {
-    font-size: 24px;
-    color: #333;
-    text-decoration: none;
-}
-
-.nav-links {
-    list-style: none;
+.remember-me {
     display: flex;
-    gap: 20px;
+    align-items: center;
 }
 
-.nav-links li {
-    display: inline;
+.remember-me input {
+    margin-right: 0.4rem;
 }
 
-.nav-links a {
-    color: #333;
+.forgot-password {
+    color: #007bff;
     text-decoration: none;
-    font-size: 18px;
-    padding: 0.5rem 1rem;
-    border-radius: 5px;
-    transition: background-color 0.3s, color 0.3s;
 }
 
-.nav-links a:hover {
-    background-color: #007bff;
-    color: white;
+.forgot-password:hover {
+    text-decoration: underline;
 }
 
 /* Button Styles */
@@ -77,110 +80,54 @@ body, html {
     background-color: #0056b3; /* Darker blue on hover */
 }
 
-/* Content Section */
-.content {
-    background-color: #fff;
-    padding: 2rem;
-    border-radius: 10px;
-    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
-    width: 100%;
-    max-width: 800px;
-    margin: auto;
+/* Login Form Text */
+.login-form p {
     text-align: center;
-}
-
-/* Footer Styles */
-footer {
-    background-color: #fff;
-    width: 100%;
-    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
-    border-radius: 10px;
-    text-align: center;
-    padding: 1.5rem;
+    margin-top: 1rem;
     color: #666;
-    margin-top: 20px;
 }
 
-/* About Section */
-.about-section {
-    background-color: #fff;
-    padding: 2rem;
-    border-radius: 10px;
-    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
-    width: 100%;
-    max-width: 800px;
-    margin: auto;
-    text-align: left;
-}
-
-.about-section h1, .about-section h2 {
-    color: #333;
-    margin-bottom: 1rem;
-}
-
-.about-section p {
-    font-size: 1rem;
-    margin-bottom: 1.5rem;
-    color: #666;
-    line-height: 1.6;
-}
-
-.about-section ul {
-    margin-bottom: 1.5rem;
-    list-style-type: disc;
-    padding-left: 1.5rem;
-}
-
-.about-section ul li {
-    margin-bottom: 0.5rem;
-    color: #333;
-}
-
-.about-section a {
+.login-form p a {
     color: #007bff;
     text-decoration: none;
 }
 
-.about-section a:hover {
+.login-form p a:hover {
     text-decoration: underline;
 }
 
-/* Responsive Design */
-
-/* For screens smaller than 768px (tablets and smaller devices) */
-@media (max-width: 768px) {
-    .navbar .container {
-        flex-direction: column;
-        align-items: flex-start;
-    }
-
-    .nav-links {
-        flex-direction: column;
-        gap: 10px;
-    }
-
-    .content, .about-section {
-        padding: 1rem;
-        margin: 0 1rem;
+/* Responsive Styles */
+@media (max-width: 500px) {
+    .login-container {
+        padding: 1.5rem;
     }
 }
 
-/* For screens smaller than 480px (mobile devices) */
-@media (max-width: 480px) {
-    .brand {
-        font-size: 20px;
-    }
+/* Signup Styles */
+.signup-form h2 {
+    text-align: center;
+    margin-bottom: 1.5rem;
+    color: #333;
+}
 
-    .nav-links a {
-        font-size: 16px;
-        padding: 0.5rem;
-    }
+.signup-form p {
+    text-align: center;
+    margin-top: 1rem;
+    color: #666;
+}
 
-    footer {
-        padding: 1rem;
-    }
+.signup-form p a {
+    color: #007bff;
+    text-decoration: none;
+}
 
-    .about-section {
-        padding: 1rem;
+.signup-form p a:hover {
+    text-decoration: underline;
+}
+
+/* Responsive Styles for Signup */
+@media (max-width: 500px) {
+    .signup-container {
+        padding: 1.5rem;
     }
 }
