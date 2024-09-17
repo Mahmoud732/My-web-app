@@ -3,6 +3,12 @@ from django.shortcuts import render
 
 # Create your views here.
 
+def index(request):
+    return render(request, 'app/index.html')
+
+def about(request):
+    return render(request, 'app/about.html')
+
 def singup(request):
     return render(request, 'app/singup.html')
 
@@ -18,6 +24,3 @@ def forgot_password(request):
 
 def reset_password(request):
     return render(request, 'app/reset-password.html')
-
-def index(request):
-    return render(request, 'app/index.html')
