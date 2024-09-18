@@ -140,34 +140,47 @@ footer a:hover {
 
 /* Navbar Styles */
 .navbar {
+    background-color: #fff;
+    width: 100%;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+    padding: 1rem;
+}
+
+.navbar .container {
+    display: flex;
+    justify-content: space-between; /* This will place the brand on the left and nav links on the right */
+    align-items: center;
+}
+
+.brand {
+    font-size: 24px;
+    color: #333;
+    text-decoration: none;
+}
+
+.nav-links {
+    list-style: none;
+    display: flex;
+    gap: 20px; /* Space between buttons */
+    margin-left: auto; /* Pushes nav-links to the right */
+}
+
+.nav-links li {
+    display: inline;
+}
+
+.nav-links a {
+    color: #333;
+    text-decoration: none;
+    font-size: 18px;
+    padding: 0.5rem 1rem;
+    border-radius: 5px;
+    transition: background-color 0.3s, color 0.3s;
+}
+
+.nav-links a:hover {
     background-color: #007bff;
     color: white;
-    padding: 1rem;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
-    border-radius: 5px;
-}
-
-.navbar a {
-    color: white;
-    text-decoration: none;
-    padding: 0.75rem;
-    border-radius: 5px;
-    transition: background-color 0.3s ease;
-}
-
-.navbar a:hover {
-    background-color: #0056b3;
-}
-
-.navbar-brand {
-    font-size: 1.5rem;
-    font-weight: 700;
-    color: white;
-}
-
-.navbar-nav {
-    display: flex;
-    justify-content: space-between;
 }
 
 /* Buttons */
