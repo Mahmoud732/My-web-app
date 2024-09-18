@@ -1,20 +1,29 @@
 {% extends 'base.html' %}
-{% block content %}
-    <div class="home-content">
-        <h1>Welcome to MyDjangoApp</h1>
-        <p>This is the home page of our app.</p>
-    </div>
-    {% for product in products %}
-        <div>
-            <img src={{product.image}} alt='product image'>
-            <p>
-                <strong>{{product.name}}</strong>
-                <strong>{{product.price}}$</strong>
-            </p>
-            <p>
-                <strong>{{product.description}}</strong>
-            </p>
 
-        <div>
-    {%endfor%}
-{%endblock%}
+{% block content %}
+<div class="container mt-5">
+    <!-- Main Heading -->
+    <div class="text-center mb-5">
+        <h1 class="display-4">Welcome to MyDjangoApp</h1>
+    </div>
+
+    <!-- Products Section -->
+    <div class="products-wrapper">
+        {% for product in products %}
+            {% if product.active %}
+            <div class="product-card card shadow-sm">
+                <img class="card-img-top" src="{{ product.image }}" alt="product image" style="height: 200px; object-fit: cover;">
+                <div class="card-body">
+                    <h5 class="card-title text-primary">{{ product.name }}</h5>
+                    <p class="card-text"><strong>Price: </strong>${{ product.price }}</p>
+                    <p class="card-text"><strong>Description: </strong>{{ product.description }}</p>
+                </div>
+                <div class="card-footer text-center">
+                    <button class="btn btn-primary">Add to Cart</button>
+                </div>
+            </div>
+            {% endif %}
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}
