@@ -8,112 +8,182 @@
 
 body, html {
     height: 100%;
-    background-color: #f8f9fa;
+    background-color: #f4f4f9;
     color: #333;
 }
 
-.container {
-    max-width: 1200px;
-    margin: 2rem auto;
-    padding: 0 1rem;
+/* Navbar Styles */
+.navbar {
+    background-color: #fff;
+    width: 100%;
+    padding: 1rem 2rem;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
+    position: sticky;
+    top: 0;
+    z-index: 1000;
 }
 
-/* Products Grid Layout - 4 Cards in a Row */
+.navbar .brand {
+    font-size: 28px;
+    color: #007bff;
+    text-decoration: none;
+    font-weight: 600;
+}
+
+.navbar .nav-links {
+    list-style: none;
+    display: flex;
+    gap: 1.5rem;
+    margin-left: auto;
+}
+
+.navbar .nav-links a {
+    font-size: 16px;
+    color: #333;
+    text-decoration: none;
+    padding: 0.5rem 1rem;
+    border-radius: 30px;
+    transition: background-color 0.3s, color 0.3s;
+}
+
+.navbar .nav-links a:hover {
+    background-color: #007bff;
+    color: #fff;
+}
+
+/* Banner Section */
+.banner {
+    width: 100%;
+    height: 300px;
+    background: linear-gradient(rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0.3)), url('/static/images/banner.jpg') center/cover no-repeat;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: #fff;
+    text-align: center;
+}
+
+.banner h1 {
+    font-size: 48px;
+    font-weight: 700;
+    letter-spacing: 2px;
+}
+
+.banner p {
+    font-size: 20px;
+    margin-top: 1rem;
+}
+
+/* Products Section */
 .products-wrapper {
     display: grid;
-    grid-template-columns: repeat(4, 1fr); /* 4 columns layout */
-    gap: 20px; /* Space between cards */
-    padding: 2rem 0;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 20px;
+    padding: 2rem;
     justify-items: center;
 }
 
-/* Product Card */
 .product-card {
     background-color: #fff;
-    border-radius: 12px;
+    border-radius: 10px;
     overflow: hidden;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
-    transition: transform 0.3s, box-shadow 0.3s ease;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
     width: 100%;
-    max-width: 250px; /* Fixed card width */
-    display: flex;
-    flex-direction: column;
+    max-width: 300px;
 }
 
 .product-card:hover {
     transform: translateY(-10px);
-    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
 }
 
-/* Product Image */
 .product-card img {
     width: 100%;
     height: 200px;
     object-fit: cover;
-    border-bottom: 1px solid #e9ecef;
 }
 
-/* Card Body */
 .product-card .card-body {
     padding: 1rem;
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-    flex-grow: 1;
 }
 
 .product-card .card-title {
-    font-size: 18px;
+    font-size: 20px;
     color: #007bff;
     font-weight: 600;
     margin-bottom: 0.5rem;
-    text-align: center;
 }
 
 .product-card .card-text {
     font-size: 14px;
     color: #666;
-    margin-bottom: 1rem;
-    text-align: center;
+    margin-bottom: 0.5rem;
 }
 
 .product-card .price {
-    font-size: 16px;
+    font-size: 18px;
     font-weight: bold;
     color: #333;
     margin-bottom: 1rem;
-    text-align: center;
 }
 
-/* Button */
 .product-card .btn {
-    padding: 0.75rem;
+    display: inline-block;
+    padding: 0.8rem 1.2rem;
     background-color: #007bff;
     color: #fff;
     text-align: center;
     border-radius: 5px;
-    font-size: 14px;
+    font-size: 16px;
+    font-weight: 500;
     cursor: pointer;
     transition: background-color 0.3s ease;
     width: 100%;
-    margin-top: auto;
 }
 
 .product-card .btn:hover {
     background-color: #0056b3;
 }
 
-/* Responsive Design */
-/* For screens between 768px and 1024px, show 2 cards in a row */
-@media (max-width: 1024px) {
-    .products-wrapper {
-        grid-template-columns: repeat(2, 1fr);
-    }
+/* Footer */
+footer {
+    background-color: #333;
+    color: #fff;
+    padding: 1.5rem 2rem;
+    text-align: center;
 }
 
-/* For screens below 768px (mobile), show 1 card in a row */
+footer a {
+    color: #007bff;
+    text-decoration: none;
+}
+
+footer a:hover {
+    text-decoration: underline;
+}
+
+/* Responsive Design */
 @media (max-width: 768px) {
+    .navbar .nav-links {
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    .banner {
+        height: 200px;
+    }
+
+    .banner h1 {
+        font-size: 32px;
+    }
+
     .products-wrapper {
-        grid-template-columns: 1fr;
+        padding: 1rem;
+    }
+
+    .product-card {
+        width: 100%;
+        max-width: none;
     }
 }
