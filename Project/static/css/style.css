@@ -6,10 +6,139 @@
     font-family: 'Poppins', sans-serif;
 }
 
-body, html {
-    height: 100%;
-    background-color: #f8f9fa;
+/* General Styling */
+.content {
+    font-family: 'Arial', sans-serif;
+    background-color: #f4f7f6;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+}
+
+/* Login Form */
+.login-form, .signup-form, .forgot-password-form{
+    background-color: #ffffff;
+    border-radius: 10px;
+    padding: 40px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    width: 100%;
+    max-width: 400px;
+    text-align: center;
+}
+
+.about-container {
+    background-color: #ffffff;
+    border-radius: 10px;
+    padding: 40px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    width: 100%;
+    max-width: 1024px;
+    text-align: center;
+}
+
+/* Form Heading */
+.login-form h2 {
+    margin-bottom: 20px;
+    font-size: 24px;
     color: #333;
+}
+
+/* Input Fields */
+.input-field {
+    margin-bottom: 20px;
+    width: 100%;
+}
+
+.input-field input {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    font-size: 16px;
+    color: #333;
+    background-color: #f4f7f6;
+    outline: none;
+    transition: border-color 0.3s ease;
+}
+
+.input-field input:focus {
+    border-color: #007bff;
+}
+
+/* Options Section */
+.options {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.remember-me {
+    display: flex;
+    align-items: center;
+}
+
+.remember-me input {
+    margin-right: 5px;
+}
+
+.forgot-password {
+    font-size: 14px;
+    color: #007bff;
+    text-decoration: none;
+    transition: color 0.3s ease;
+}
+
+.forgot-password:hover {
+    color: #0056b3;
+}
+
+/* Submit Button */
+.btn {
+    width: 100%;
+    padding: 12px;
+    background-color: #007bff;
+    color: #ffffff;
+    border: none;
+    border-radius: 5px;
+    font-size: 16px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.btn:hover {
+    background-color: #0056b3;
+}
+
+/* Signup Text */
+.signup-text {
+    margin-top: 20px;
+    font-size: 14px;
+    color: #555;
+}
+
+.signup-text a {
+    color: #007bff;
+    text-decoration: none;
+    transition: color 0.3s ease;
+}
+
+.signup-text a:hover {
+    color: #0056b3;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .login-form {
+        padding: 30px;
+    }
+
+    .login-form h2 {
+        font-size: 20px;
+    }
 }
 
 .container {

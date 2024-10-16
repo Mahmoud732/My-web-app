@@ -4,7 +4,7 @@
 <div class="container mt-5">
     <!-- Main Heading -->
     <div class="text-center mb-5">
-        <h1 class="display-4">Welcome to MyDjangoApp</h1>
+        <h1 class="display-4">Apps Gallery</h1>
     </div>
 
     <!-- Products Section -->
@@ -12,7 +12,7 @@
         {% for product in products %}
             {% if product.active %}
             <div class="product-card card shadow-sm">
-                <img class="card-img-top" src="{{ product.image }}" alt="product image" style="height: 200px; object-fit: cover;">
+                <img class="card-img-top" src="{{ product.image.url }}" alt="product image" style="height: 200px; object-fit: cover;">
                 <div class="card-body">
                     <h5 class="card-title text-primary">{{ product.name }}</h5>
                     <p class="card-text"><strong>Price: </strong>${{ product.price }}</p>
