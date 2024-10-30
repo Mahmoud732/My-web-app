@@ -1,0 +1,46 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    <h1>My Orders</h1>
+    <div class="order-wrapper">
+        {% if orders %}
+            {% for order in orders %}
+            <div class="order-card">
+                <div class="order-details">
+                    <h2>Order ID: {{ order.id }} - {{ order.get_status_display }}</h2>
+                    <p><strong>Order Date:</strong> {{ order.order_date }}</p>
+                    <p><strong>Total Price:</strong> {{ order.total_price }} EGP</p>
+                    <p><strong>Status:</strong> <span class="{% if order.get_status_display == 'Shipped' %}status-shipped{% else %}status-other{% endif %}">{{ order.get_status_display }}</span></p>
+                    
+                    <h3>Items</h3>
+                    <ul>
+                        {% for item in order.items.all %}
+                            <li>
+                                {{ item.product.name }} - Quantity: {{ item.quantity }} - Price: {{ item.price }} EGP - Total: {{ item.get_total_price }} EGP
+                                <ul>
+                                    <li>{% if not order.token_activated %}
+                                        <form action="{% url 'order_confirmation' order.id %}" method="POST">
+                                        {% csrf_token %}
+                                        <button class="btn btn-primary">Activate Token</button>
+                                    </form>
+                                    {% else %}
+                                    <p>Activation Code: {{ order.token.token }}</p>
+                                    <p>Activated at: {{ order.token.created_at }}</p>
+                                    <p>Expires at: {{ order.token.expires_at }}</p>
+                                    <p>Remaining time: {{ order.token.remaining_time }}</p>
+                                    {% endif %}
+                                    </li>
+                                </ul>
+                            </li>
+                        {% endfor %}
+                    </ul>
+
+                </div>
+            </div>
+            <hr>
+            {% endfor %}
+        {% else %}
+            <p>You have no orders.</p>
+        {% endif %}
+    </div>
+{% endblock %}

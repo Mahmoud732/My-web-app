@@ -1,10 +1,22 @@
-<nav class="navbar">
-    <div class="container">
-        <a href="/" class="brand">MyDjangoApp</a>
-        <ul class="nav-links">
-            <li><a href="{% url 'products' %}">Home</a></li>
-            <li><a href="{% url 'about' %}">About</a></li>
-            <li><a href="{% url 'LoginPage' %}">Login</a></li>
+<header>
+    <nav class="navbar">
+        <div class="logo">ShopLogo</div>
+        <ul>
+          <li><a href="{% url 'Home' %}">Home</a></li>
+          <li><a href="{% url 'Shop' %}">Shop</a></li>
+          <li><a href="{% url 'Orders' %}">Orders</a></li>
+          {% if request.user.is_authenticated and request.user.is_staff %}
+          <!-- Only show this link if the user is logged in and is an admin -->
+          <li><a href="{% url 'view_messages' %}">Messages</a></li>
+          {% endif %}
+          <li><a href="{% url 'Contact' %}">Contact</a></li>
+          {% if user.is_authenticated %} 
+          <li><a href="{% url 'profile' %}">Profile</a></li>
+          <div class="cart"><a href="{% url 'Cart' %}">🛒</a></div>
+          {% else %}
+          <li><a href="{% url 'login' %}">Login</a></li>
+          {% endif %}
         </ul>
-    </div>
-</nav>
+        <div class="menu-icon">☰</div>
+    </nav>
+</header>

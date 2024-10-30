@@ -24,22 +24,43 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure-65_7-&p4#+i)@0v&kjb+w*50)#y&9@nm5^idoqq&t6w#7(_51-'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+DEBUG = True
 
-ALLOWED_HOSTS = ['test-full-stack-app-344b29111c7c.herokuapp.com', 'localhost', '127.0.0.1', '0.0.0.0', '192.168.1.2', '192.168.1.255']
+ALLOWED_HOSTS = ['test-full-stack-app-344b29111c7c.herokuapp.com', 'localhost', '127.0.0.1', '0.0.0.0', '192.168.1.104']
 
+AUTH_PASSWORD_VALIDATORS = [
+    {
+        'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
+    },
+    {
+        'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator',
+        'OPTIONS': {
+            'min_length': 8,
+        },
+    },
+    {
+        'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator',
+    },
+    {
+        'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
+    },
+]
 
 # Application definition
-
 INSTALLED_APPS = [
-    'app.apps.AppConfig',
-    'products.apps.ProductsConfig',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    
+
+    'registration.apps.RegistrationConfig',
+    'app.apps.AppConfig',
+    'cart.apps.CartConfig',
+    'checkout.apps.CheckoutConfig',
+    'generator.apps.GeneratorConfig',
 ]
 
 MIDDLEWARE = [
@@ -51,7 +72,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-]
+    ]
 
 ROOT_URLCONF = 'Project.urls'
 
@@ -103,7 +124,13 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
-
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtp.gmail.com'  # or your email host
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+EMAIL_HOST_USER = 'm.ahmed732005@gmail.com'  # your email address
+EMAIL_HOST_PASSWORD = '#M7a3h2M0o0u5D#'  # your email password
+DEFAULT_FROM_EMAIL = 'm.ahmed732005@gmail.com'  # sender's email
 # Internationalization
 # https://docs.djangoproject.com/en/5.1/topics/i18n/
 

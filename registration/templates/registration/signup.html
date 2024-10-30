@@ -1,0 +1,87 @@
+{% extends 'base.html' %}
+
+{% block title %}Signup{% endblock %}
+
+{% load static %}
+
+{% block content %}
+    <form class="card" method="POST">
+        {% csrf_token %}
+        <h2>Create Account</h2>
+        
+        <!-- First Name Field -->
+        <div class="input-field">
+            <label for="first_name">First Name:</label>
+            <input type="text" name="first_name" id="first_name" required>
+            <!-- Display any error related to first_name if needed -->
+            {% if form.first_name.errors %}
+                <div class="error">{{ form.first_name.errors }}</div>
+            {% endif %}
+        </div>
+
+        <!-- Last Name Field -->
+        <div class="input-field">
+            <label for="last_name">Last Name:</label>
+            <input type="text" name="last_name" id="last_name" required>
+            <!-- Display any error related to last_name if needed -->
+            {% if form.last_name.errors %}
+                <div class="error">{{ form.last_name.errors }}</div>
+            {% endif %}
+        </div>
+
+        <!-- Username Field -->
+        <div class="input-field">
+            <label for="username">Username:</label>
+            <input type="text" name="username" id="username" required>
+            <!-- Display any error related to username if needed -->
+            {% if form.username.errors %}
+                <div class="error">{{ form.username.errors }}</div>
+            {% endif %}
+        </div>
+        
+        <!-- Email Field -->
+        <div class="input-field">
+            <label for="email">Email:</label>
+            <input type="email" name="email" id="email" required>
+            <!-- Display any error related to email if needed -->
+            {% if form.email.errors %}
+                <div class="error">{{ form.email.errors }}</div>
+            {% endif %}
+        </div>
+        
+        <!-- Password1 Field -->
+        <div class="input-field">
+            <label for="password">Password:</label>
+            <input type="password" name="password" id="password" required>
+            <!-- Display any error related to password if needed -->
+            {% if form.password1.errors %}
+                <div class="error">{{ form.password1.errors }}</div>
+            {% endif %}
+        </div>
+        
+        <!-- Password2 Field -->
+        <div class="input-field">
+            <label for="confirm_password">Confirm Password:</label>
+            <input type="password" name="confirm_password" id="confirm_password" required>
+            <!-- Display any error related to password confirmation if needed -->
+            {% if form.password2.errors %}
+                <div class="error">{{ form.password2.errors }}</div>
+            {% endif %}
+        </div>
+
+        <!-- Birthday Field -->
+        <div class="input-field">
+            <label for="birthday">Birthday:</label>
+            <input type="date" name="birthday" id="birthday">
+            <!-- Display any error related to birthday if needed -->
+            {% if form.birthday.errors %}
+                <div class="error">{{ form.birthday.errors }}</div>
+            {% endif %}
+        </div>
+        
+        <!-- Submit Button -->
+        <button type="submit" class="btn">Sign Up</button>
+        
+        <p>Already have an account? <a href="{% url 'login' %}">Login</a></p>
+    </form>
+{% endblock %}

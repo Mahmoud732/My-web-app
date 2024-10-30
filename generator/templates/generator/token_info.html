@@ -1,0 +1,35 @@
+{% extends 'base.html' %}
+{% block content %}
+    <div class="container">
+        <h1>Token Information</h1>
+        <div class="info">
+            <div>
+                <span class="label">Token:</span>
+                <span class="value">{{ token }}</span>
+            </div>
+            <div>
+                <span class="label">Expires At:</span>
+                <span class="value">{{ expires_at }}</span>
+            </div>
+            <div>
+                <span class="label">Remaining Time:</span>
+                <span class="value">{{ remaining_time }}</span>
+            </div>
+        </div>
+        <div class="expires">Please use this token before it expires!</div>
+        <div class="button-container">
+            <button class="button" onclick="copyToken()">Copy Token</button>
+        </div>
+    </div>
+
+    <script>
+        function copyToken() {
+            const token = "{{ token }}";
+            navigator.clipboard.writeText(token).then(() => {
+                alert('Token copied to clipboard!');
+            }).catch(err => {
+                console.error('Failed to copy text: ', err);
+            });
+        }
+    </script>
+{% endblock %}

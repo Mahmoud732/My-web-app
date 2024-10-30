@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+{% block content %}
+  <h2>Checkout</h2>
+  <form method="post">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <h3>Order Summary</h3>
+    <ul>
+      {% for item in cart_items %}
+        <li>{{ item.product.name }} ({{ item.quantity }}) - ${{ item.product.price }}</li>
+      {% endfor %}
+    </ul>
+    <p>{{order}}</p>
+    <p>Total: {{order.total_price}} EGP</p>
+    {% if not order.token_activated %}
+    <form action="{% url 'order_confirmation' order.id %}" method="POST">
+      {% csrf_token %}
+      <button class="btn btn-primary">Activate Token</button>
+    </form>
+    {% else %}
+    <p><strong>You already Activated the Token.</strong></p>
+    <form action="{% url 'Orders' %}" method="POST">
+      {% csrf_token %}
+      <button class="btn btn-primary">My Orders</button>
+    </form>
+    {% endif%}
+  </form>
+{% endblock %}

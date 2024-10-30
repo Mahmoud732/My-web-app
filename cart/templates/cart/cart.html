@@ -1,0 +1,59 @@
+{% extends 'base.html' %}
+
+{% block title %}Your Cart{% endblock %}
+
+{% load static %}
+{% load custom_filters %}
+
+{% block content %}
+<div class="container mt-5">
+    <h1 class="mb-4 text-center">Shopping Cart</h1>
+    
+    <div class="row">
+        <div class="col-lg-8">
+            {% if items %}
+            <ul class="list-group mb-4">
+                {% for item in items %}
+                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                        <div>
+                            <h5>{{ item.product.name }}</h5>
+                            <p>Quantity: {{ item.quantity }}</p>
+                            <p>Price per unit: {{ item.product.price|floatformat:2 }} EGP</p>
+                        </div>
+                        <span class="badge badge-primary badge-pill">{{ item.quantity|multiply:item.product.price|floatformat:2 }} EGP</span>
+                        <a href="{% url 'DecrementItem' item.id %}" class="btn btn-danger btn-sm">Remove</a>
+                        <a href="{% url 'IncrementItem' item.id %}" class="btn btn-primary">Add</a>
+                    </li>
+                {% endfor %}
+            </ul>
+            {% else %}
+            <div class="alert alert-warning text-center">
+                Your cart is empty.
+            </div>
+            {% endif %}
+        </div>
+
+        <div class="col-lg-4">
+            <div class="card">
+                <div class="card-body">
+                    <h4 class="card-title">Order Summary</h4>
+                    <ul class="list-group list-group-flush">
+                        <li class="list-group-item d-flex justify-content-between">
+                            <span>Total Items:</span>
+                            <strong>{{ items|length }}</strong>
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between">
+                            <span>Total Price:</span>
+                            <strong>
+                                {{ total_price }} EGP
+                            </strong>
+                        </li>
+                    </ul>
+                    <a href="{% url 'Checkout' %}" class="btn btn-primary btn-block mt-4">Proceed to Checkout</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
