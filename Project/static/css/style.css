@@ -109,6 +109,14 @@
       width: 500%;
     }
 
+    /* Center the container */
+    .login-container ,.signup-container, .forget-password-container{
+      display: flex;              /* Enable flexbox */
+      justify-content: center;    /* Center horizontally */
+      align-items: center;        /* Center vertically */
+      height: 100vh;             /* Full viewport height */
+    }
+
     .nav-container, .menu-toggle{
         margin: 2rem auto;
         padding: 0 1rem;

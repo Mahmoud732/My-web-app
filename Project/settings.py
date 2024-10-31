@@ -131,8 +131,8 @@ EMAIL_HOST = 'smtp.gmail.com'  # or your email host
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True
 EMAIL_HOST_USER = 'm.ahmed732005@gmail.com'  # your email address
-EMAIL_HOST_PASSWORD = '#M7a3h2M0o0u5D#'  # your email password
-DEFAULT_FROM_EMAIL = 'm.ahmed732005@gmail.com'  # sender's email
+EMAIL_HOST_PASSWORD = 'tmiz vqpt mlgi xcgp'  # your email password
+DEFAULT_FROM_EMAIL = 'YT_backend m.ahmed732005@gmail.com'  # sender's email
 # Internationalization
 # https://docs.djangoproject.com/en/5.1/topics/i18n/
 

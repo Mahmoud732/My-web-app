@@ -5,33 +5,35 @@
 {% load static %}
 
 {% block content %}
-    <form class="login-form" method="POST">
-        {% csrf_token %}
-        <h2>Login to Your Account</h2>
-        
-        <!-- Email/Username Field -->
-        <div class="input-field">
-            <input type="text" name="email" placeholder="Email Address/Username" class="form-control" required>
-        </div>
-        
-        <!-- Password Field -->
-        <div class="input-field">
-            <input type="password" name="password" placeholder="Password" class="form-control" required>
-        </div>
-        
-        <!-- Options: Remember Me and Forgot Password -->
-        <div class="options">
-            <div class="remember-me">
-                <input type="checkbox" id="remember" class="form-check-input">
-                <label for="remember">Remember Me</label>
+    <div class='login-container'>
+        <form class="login-form" method="POST">
+            {% csrf_token %}
+            <h2>Login to Your Account</h2>
+            
+            <!-- Email/Username Field -->
+            <div class="input-field">
+                <input type="text" name="email" placeholder="Email Address/Username" class="form-control" required>
             </div>
-            <a href="{% url 'password_reset' %}" class="forgot-password">Forgot Password?</a>
-        </div>
-        
-        <!-- Submit Button -->
-        <button type="submit" class="btn">Login</button>
-        
-        <!-- Signup Link -->
-        <p>Don't have an account? <a href="{% url 'signup' %}">Sign Up</a></p>
-    </form>
-{% endblock %}
+            
+            <!-- Password Field -->
+            <div class="input-field">
+                <input type="password" name="password" placeholder="Password" class="form-control" required>
+            </div>
+            
+            <!-- Options: Remember Me and Forgot Password -->
+            <div class="options">
+                <div class="remember-me">
+                    <input type="checkbox" id="remember" class="form-check-input">
+                    <label for="remember">Remember Me</label>
+                </div>
+                <a href="{% url 'password_reset' %}" class="forgot-password">Forgot Password?</a>
+            </div>
+            
+            <!-- Submit Button -->
+            <button type="submit" class="btn">Login</button>
+            
+            <!-- Signup Link -->
+            <p>Don't have an account? <a href="{% url 'signup' %}">Sign Up</a></p>
+        </form>
+    </div>
+    {% endblock %}
