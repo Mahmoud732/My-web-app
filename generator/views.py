@@ -69,7 +69,7 @@ def generate_token(request):
         
         # Update order status and token activation
         order.token_activated = True
-        order.status = 'C'  # Assuming 'C' stands for Completed
+        order.order_status = 'C'  # Assuming 'C' stands for Completed
         order.save()
     except Exception as e:
         logger.error(f'Database error: {e}')

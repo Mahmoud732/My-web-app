@@ -3,6 +3,9 @@ from django.contrib.auth.models import User
 from django.utils import timezone
 from app.models import Product
 from datetime import timedelta
+from django.db.models.signals import post_save
+from django.dispatch import receiver
+
 
 class Order(models.Model):
     ORDER_STATUS_CHOICES = [
@@ -12,7 +15,7 @@ class Order(models.Model):
         ('R', 'Returned'),
         ('F', 'Failed'),
     ]
-    
+
     PAYMENT_STATUS_CHOICES = [
         ('P', 'Pending'),
         ('C', 'Completed'),
@@ -24,7 +27,7 @@ class Order(models.Model):
     order_date = models.DateTimeField(auto_now_add=True)
     shipping_address = models.TextField()
     total_price = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
-    status = models.CharField(max_length=1, choices=ORDER_STATUS_CHOICES, default='P')
+    order_status = models.CharField(max_length=1, choices=ORDER_STATUS_CHOICES, default='P')
     payment_status = models.CharField(max_length=1, choices=PAYMENT_STATUS_CHOICES, default='P')
     shipping_date = models.DateTimeField(null=True, blank=True)
     token_activated = models.BooleanField(default=False)
@@ -36,15 +39,16 @@ class Order(models.Model):
 
     def update_order_status(self, new_status):
         """Update order status and handle related changes."""
-        self.status = new_status
+        self.order_status = new_status  # Corrected from self.status to self.order_status
         if new_status == 'S':
             self.shipping_date = timezone.now()
         elif new_status == 'C':
-            self.delivery_date = timezone.now()
+            self.delivery_date = timezone.now()  # Ensure you have a delivery_date field in your model
         self.save()
 
     def __str__(self):
-        return f"Order {self.id} by {self.customer.username}"
+        return f"Order {self.id} by {self.customer.username} | Payment Status: {dict(self.PAYMENT_STATUS_CHOICES)[self.payment_status]} | Order Status: {dict(self.ORDER_STATUS_CHOICES)[self.order_status]}"
+
 
 class OrderItem(models.Model):
     order = models.ForeignKey(Order, related_name="items", on_delete=models.CASCADE)
@@ -57,12 +61,10 @@ class OrderItem(models.Model):
         return self.price * self.quantity
 
     def __str__(self):
-        return f"{self.product.name} (x{self.quantity}) - {self.get_total_price()}"
+        return f"{self.product.name} (x{self.quantity}) - Total: {self.get_total_price()}"
+
 
 # Signals to automatically calculate order total after an order item save
-from django.db.models.signals import post_save
-from django.dispatch import receiver
-
 @receiver(post_save, sender=OrderItem)
 def update_order_total(sender, instance, **kwargs):
     instance.order.calculate_total()

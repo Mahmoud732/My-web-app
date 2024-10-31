@@ -1,8 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import User
 from datetime import datetime
-from django.db.models.signals import post_save
-from django.dispatch import receiver
 
 class UsersProfile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE, null=True)
@@ -19,5 +17,5 @@ class UsersProfile(models.Model):
         return None
 
     def __str__(self):
-        return f'{self.user.username} {self.email}'
+        return f'{self.user.username} ({self.user.email})'
 

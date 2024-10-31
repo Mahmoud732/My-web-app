@@ -56,6 +56,8 @@ def checkout_view(request):
 
                 # Clear cart after placing the order
                 cart.items.all().delete()
+                order.payment_status = 'C'
+                order.save()
                 messages.success(request, 'Order placed successfully!')
                 return redirect('order_confirmation', order_id=order.id)
         
