@@ -3,14 +3,18 @@ from django.contrib import messages
 from django.http import JsonResponse
 from django.contrib.auth.decorators import login_required
 from django.views.decorators.http import require_POST
+from django.views.decorators.csrf import csrf_exempt
 from django.utils import timezone
+from time import time
 from checkout.models import Order
 from generator.models import Token
 from pymongo import MongoClient
 from datetime import timedelta
+import json
 import os
 import secrets
 import logging
+import pytz
 
 # Set up logging
 logger = logging.getLogger(__name__)
@@ -21,7 +25,7 @@ client = MongoClient(MONGO_URI)
 db = client['auth_app']
 tokens_collection = db['tokens']
 
-TOKEN_RATE_LIMIT = (timedelta(minutes=5))
+TOKEN_RATE_LIMIT = (timedelta(seconds=30))
 
 @login_required
 def generate_token(request):
@@ -82,19 +86,22 @@ def generate_token(request):
         'remaining_time': str(remaining_time)  # Convert to string for display
     })
 
-@login_required
+# @login_required
+@csrf_exempt
 @require_POST
 def validate_token(request):
-    user_id = request.POST.get('user_id')
-    token = request.POST.get('token')
+    data = json.loads(request.body)
+    token = data.get('token')
+    user_id = data.get('user_id')
     if not token:
         return JsonResponse({"error": "Token is required."}, status=400)
 
     # Check rate limiting
     last_request_time = request.session.get('last_request_time')
-    if last_request_time and timezone.now() < last_request_time + TOKEN_RATE_LIMIT:
+    current_time = time()  # Current time as a UNIX timestamp
+    if last_request_time and current_time < last_request_time + TOKEN_RATE_LIMIT.total_seconds():
         return JsonResponse({"error": "Rate limit exceeded. Please try again later."}, status=429)
-    request.session['last_request_time'] = timezone.now()  # Update the last request time
+    request.session['last_request_time'] = current_time  # Save current time as UNIX timestamp
 
     try:
         token_data = tokens_collection.find_one({"token": token})
@@ -103,7 +110,12 @@ def validate_token(request):
         return JsonResponse({"error": "Can't connect to the server."}, status=500)
 
     if token_data:
-        if timezone.now() > token_data['expiresAt']:
+        # Ensure token_data['expiresAt'] is timezone-aware
+        expires_at = token_data['expiresAt']
+        if expires_at.tzinfo is None:  # Check if it's offset-naive
+            expires_at = expires_at.replace(tzinfo=pytz.UTC)  # Make it UTC timezone-aware
+
+        if timezone.now() > expires_at:
             return JsonResponse({"error": "Token has expired."}, status=400)
 
         if token_data['user_id'] and token_data['user_id'] != user_id:
@@ -116,6 +128,6 @@ def validate_token(request):
         if token_data.get("purpose") != "purchase":
             return JsonResponse({"error": "Token not valid for purchase."}, status=400)
 
-        return JsonResponse({"success": "Token is valid. You can proceed with your purchase."}, status=200)
+        return JsonResponse({"success": "Token is valid."}, status=200)
     else:
         return JsonResponse({"error": "Token not found."}, status=404)
