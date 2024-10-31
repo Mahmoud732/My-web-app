@@ -1,23 +1,25 @@
 /* General Styles */
-* {
+  * {
     margin: 0;
     padding: 0;
     box-sizing: border-box;
-    font-family: 'Arial', sans-serif;
   }
-  
+
+  html, body {
+    width: 100%;
+    min-height: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+  }
+
   body {
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     background-color: #f4f6f8;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 100vh;
-    margin: 0;
   }
-  
-  /* Navbar Styles */
+
   .navbar {
+    width: 100%;
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -510,14 +512,14 @@
 
   /* Footer Styles */
   .footer {
+    width: 100%;
     background-color: #333;
     color: white;
     padding: 3rem 2rem;
     display: flex;
     justify-content: space-around;
     flex-wrap: wrap;
-    margin: 0 auto;
-    width: 100%;
+    margin-top: auto; /* Pushes footer to the bottom */
   }
   
   .footer .footer-section {
@@ -568,6 +570,7 @@
   
   /* Footer Bottom */
   .footer-bottom {
+    width: 100%;
     background-color: #222;
     color: white;
     padding: 1rem 2rem;
