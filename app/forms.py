@@ -1,5 +1,5 @@
 from django.contrib.auth.models import User
-from registration.models import UsersProfile
+from registration.models import UserProfile
 from django import forms
 from django.contrib.auth.forms import UserCreationForm
 from django.utils.translation import gettext_lazy as _
@@ -60,7 +60,7 @@ class CustomUserCreationForm(UserCreationForm):
         
         if commit:
             user.save()  # Save the user first
-            UsersProfile.objects.create(
+            UserProfile.objects.create(
                 user=user,  # Use the user field to link the profile
                 birthday=self.cleaned_data['birthday']  # Set the birthday from cleaned data
             )

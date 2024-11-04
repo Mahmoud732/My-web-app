@@ -28,21 +28,17 @@ tokens_collection = db['tokens']
 TOKEN_RATE_LIMIT = (timedelta(seconds=30))
 
 @login_required
-def generate_token(request):
+def generate_token(request, order_id):
     validation_id = request.session.pop('validation_id', None)
     if not validation_id:
         messages.error(request, 'Invalid or expired request!')
         return redirect(request.META.get('HTTP_REFERER', 'fallback_error_view'))  # Replace with an actual error view
 
-    # Retrieve the order ID from the session
-    order_id = request.session.get('order_id')
-    if not order_id:
-        messages.error(request, 'No order found in session.')
-        return redirect('Orders')  # Redirect to orders or an appropriate page
-
     # Fetch the order object
     order = get_object_or_404(Order, id=order_id, customer=request.user)
-
+    if order.payment_status != 'C':
+        messages.error(request, 'You haven\'t paid')
+        return redirect('Orders')  # Redirect to orders or an appropriate page
     # Calculate total time based on the quantity of items
     total_hours = sum(item.quantity * item.time.total_seconds() / 3600 for item in order.items.all())  # Convert time to hours
     TOKEN_EXPIRATION = timedelta(hours=total_hours)

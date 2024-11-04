@@ -9,12 +9,12 @@
             {% for order in orders %}
             <div class="order-card">
                 <div class="order-details">
-                    <h2>Order ID: {{ order.id }} - {{ order.get_order_status_display }}</h2>
+                    <h2>Order ID: {{ order.id }} - {{ order.get_payment_status_display }}</h2>
                     <p><strong>Order Date:</strong> {{ order.order_date }}</p>
                     <p><strong>Total Price:</strong> {{ order.total_price }} EGP</p>
                     <p><strong>Status:</strong> 
-                        <span class="{% if order.order_status == 'S' %}status-shipped{% else %}status-other{% endif %}">
-                            {{ order.get_order_status_display }} <!-- Use display method for better readability -->
+                        <span class="{% if order.payment_status == 'C' %}status-shipped{% else %}status-other{% endif %}">
+                            {{ order.get_payment_status_display }} <!-- Use display method for better readability -->
                         </span>
                     </p>
                     
@@ -26,7 +26,7 @@
                                 <ul>
                                     <li>
                                         {% if not order.token_activated %}
-                                            <form action="{% url 'order_confirmation' order.id %}" method="POST">
+                                            <form action="{% url 'generate_token' order.id %}" method="POST">
                                                 {% csrf_token %}
                                                 <button class="btn btn-primary">Activate Token</button>
                                             </form>

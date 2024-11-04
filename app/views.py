@@ -3,7 +3,7 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.models import User
 from django.contrib.auth import get_user_model
 from django.contrib.auth.decorators import login_required, user_passes_test
-from registration.models import UsersProfile
+from registration.models import UserProfile
 from app.models import Product
 from .forms import ContactForm
 from .models import ContactMessage
@@ -54,7 +54,7 @@ def profile_view(request):
 @login_required
 def edit_profile_view(request):
     user = request.user
-    profile, created = UsersProfile.objects.get_or_create(user=user)
+    profile, created = UserProfile.objects.get_or_create(user=user)
     if request.method == 'POST':
         # Using a form to handle user input
         form = ContactForm(request.POST)  # Replace with a profile form

@@ -4,7 +4,7 @@ from django.contrib.auth import login, authenticate, logout
 from django.contrib.auth.models import User
 from django import forms
 from django.urls import reverse_lazy
-from .models import UsersProfile
+from .models import UserProfile
 from django.views.generic.edit import FormView
 from django.contrib.auth.tokens import default_token_generator
 from django.utils.http import urlsafe_base64_encode
@@ -38,7 +38,7 @@ def signup_view(request):
         try:
             user = User.objects.create_user(first_name=first_name, last_name=last_name, username=username, password=password, email=email)
             user.save()
-            users_profile = UsersProfile.objects.create(user=user, birthday=birthday)
+            users_profile = UserProfile.objects.create(user=user, birthday=birthday)
             users_profile.save()
             login(request, user)
             messages.success(request, f'Account created successfully! Welcome, {user.username}')

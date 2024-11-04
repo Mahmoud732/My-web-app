@@ -2,7 +2,7 @@ from django.db import models
 from django.contrib.auth.models import User
 from datetime import datetime
 
-class UsersProfile(models.Model):
+class UserProfile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE, null=True)
     birthday = models.DateField(null=True)
     is_loggedin = models.BooleanField(default=False)
