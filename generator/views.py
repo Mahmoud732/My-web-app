@@ -32,13 +32,13 @@ def generate_token(request, order_id):
     validation_id = request.session.pop('validation_id', None)
     if not validation_id:
         messages.error(request, 'Invalid or expired request!')
-        return redirect(request.META.get('HTTP_REFERER', 'fallback_error_view'))  # Replace with an actual error view
+        return redirect('Orders')
 
     # Fetch the order object
     order = get_object_or_404(Order, id=order_id, customer=request.user)
     if order.payment_status != 'C':
         messages.error(request, 'You haven\'t paid')
-        return redirect('Orders')  # Redirect to orders or an appropriate page
+        return redirect('Checkout')
     # Calculate total time based on the quantity of items
     total_hours = sum(item.quantity * item.time.total_seconds() / 3600 for item in order.items.all())  # Convert time to hours
     TOKEN_EXPIRATION = timedelta(hours=total_hours)
@@ -90,20 +90,20 @@ def validate_token(request):
     token = data.get('token')
     user_id = data.get('user_id')
     if not token:
-        return JsonResponse({"error": "Token is required."}, status=400)
+        return JsonResponse({"error": "Required Key."}, status=400)
 
     # Check rate limiting
     last_request_time = request.session.get('last_request_time')
     current_time = time()  # Current time as a UNIX timestamp
     if last_request_time and current_time < last_request_time + TOKEN_RATE_LIMIT.total_seconds():
-        return JsonResponse({"error": "Rate limit exceeded. Please try again later."}, status=429)
+        return JsonResponse({"error": "Many attempets, Please try again later."}, status=429)
     request.session['last_request_time'] = current_time  # Save current time as UNIX timestamp
 
     try:
         token_data = tokens_collection.find_one({"token": token})
     except Exception as e:
         logger.error(f"Database error: {e}")
-        return JsonResponse({"error": "Can't connect to the server."}, status=500)
+        return JsonResponse({"error": "Can't connect to the Database."}, status=500)
 
     if token_data:
         # Ensure token_data['expiresAt'] is timezone-aware
@@ -112,18 +112,19 @@ def validate_token(request):
             expires_at = expires_at.replace(tzinfo=pytz.UTC)  # Make it UTC timezone-aware
 
         if timezone.now() > expires_at:
-            return JsonResponse({"error": "Token has expired."}, status=400)
+            return JsonResponse({"error": "Key has expired."}, status=400)
 
         if token_data['user_id'] and token_data['user_id'] != user_id:
-            return JsonResponse({"error": "Token not valid for this user."}, status=403)
+            return JsonResponse({"error": "You have no access to this Key."}, status=403)
 
         if not token_data['user_id']:
             tokens_collection.update_one({"token": token}, {"$set": {"user_id": user_id}})
 
         # Validate purpose
         if token_data.get("purpose") != "purchase":
-            return JsonResponse({"error": "Token not valid for purchase."}, status=400)
+            return JsonResponse({"error": "You need to purchase This Key"}, status=400)
 
-        return JsonResponse({"success": "Token is valid."}, status=200)
+        return JsonResponse({"success": "Login Successfully!"}, status=200)
     else:
-        return JsonResponse({"error": "Token not found."}, status=404)
+        return JsonResponse({"error": "Key not in the database."}, status=404)
+    

@@ -59,6 +59,7 @@ INSTALLED_APPS = [
 
     'registration.apps.RegistrationConfig',
     'app.apps.AppConfig',
+    'product.apps.ProductConfig',
     'cart.apps.CartConfig',
     'checkout.apps.CheckoutConfig',
     'generator.apps.GeneratorConfig',
