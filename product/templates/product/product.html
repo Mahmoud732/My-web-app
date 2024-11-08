@@ -1,0 +1,46 @@
+{% extends 'base.html' %}
+
+{% block title %}{% endblock %}
+
+{% load static %}
+
+{% block content %}
+    <div class="separator" style="clear: both;">
+      <a href="{{ product.image.url }}" style="display: block; padding: 1em 0; text-align: center; ">
+      <img alt="" border="0" data-original-height="306" data-original-width="627" src="{{ product.image.url }}"/>
+      </a>
+  	</div>
+
+    <section id="download">
+        <h1>Download Our Amazing App</h1>
+        <p>Experience the best features and seamless performance.</p>
+        <a href="{{ product.download_file.url }}" target="_blank">Download Now</a>
+    </section>
+ 
+    <section id="features">
+        <h2>Key Features</h2>
+        <div class="feature">
+            <div class="feature-item">
+                <i class="fas fa-video"></i>
+                <h3>Video Downloads</h3>
+                <p>Download videos from YouTube, Facebook, and more.</p>
+            </div>
+            <div class="feature-item">
+                <i class="fas fa-cog"></i>
+                <h3>Custom Quality</h3>
+                <p>Select the quality you want before downloading.</p>
+            </div>
+            <div class="feature-item">
+                <i class="fas fa-music"></i>
+                <h3>Audio Downloads</h3>
+                <p>Download high-quality audio files as well.</p>
+            </div>
+        </div>
+    </section>
+
+    <section id="download">
+        <h2>Get the App Now</h2>
+        <p>Click the button below to start your download.</p>
+        <a href="{{ product.download_file.url }}" target="_blank">Download Now</a>
+    </section>
+{% endblock %}

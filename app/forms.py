@@ -5,22 +5,6 @@ from django.contrib.auth.forms import UserCreationForm
 from django.utils.translation import gettext_lazy as _
 
 class CustomUserCreationForm(UserCreationForm):
-    first_name = forms.CharField(
-        max_length=30,
-        required=True,
-        widget=forms.TextInput(attrs={
-            'class': 'form-control', 
-            'placeholder': 'First Name'
-        })
-    )
-    last_name = forms.CharField(
-        max_length=30,
-        required=True,
-        widget=forms.TextInput(attrs={
-            'class': 'form-control', 
-            'placeholder': 'Last Name'
-        })
-    )
     birthday = forms.DateField(
         required=True,
         widget=forms.DateInput(attrs={

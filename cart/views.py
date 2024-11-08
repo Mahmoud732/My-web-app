@@ -2,7 +2,7 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from .models import Cart
-from app.models import Product
+from product.models import Product
 from cart.models import CartItem
 import logging
 

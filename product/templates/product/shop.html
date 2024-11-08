@@ -1,0 +1,28 @@
+{% extends 'base.html' %}
+{% block content %}
+    <!-- Main Heading -->
+    <div class="text-center mb-5">
+        <h1 class="display-4">My App Gallery</h1>
+    </div>
+
+    <!-- Products Section -->
+    <div class="products-wrapper">
+        {% for product in products %}
+            {% if product.active %}
+            <div class="product-card card shadow-sm">
+                <a href="{% url "product" product.id %}"><img class="card-img-top" src="{{ product.image.url }}" alt="product image" style="height: 200px; object-fit: cover;"></a>
+                <div class="card-body">
+                    <a href="{% url "product" product.id %}"><h5 class="card-title text-primary">{{ product.name }}</h5></a>
+                    <p class="card-text"><strong>Price: </strong>{{ product.price }} EGP</p>
+                    <p class="card-text"><strong>Description: </strong>{{ product.description }}</p>
+                </div>
+                <form action="{% url 'AddtoCart' product.id %}" method="POST">
+                    {% csrf_token %}
+                    <button class="btn btn-buy">Add to Cart</button>
+                </form>
+
+            </div>
+            {% endif %}
+        {% endfor %}
+    </div>
+{% endblock %}

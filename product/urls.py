@@ -2,6 +2,6 @@ from django.urls import path
 from . import views
 
 urlpatterns = [
-    # path('generate_token/<int:order_id>', views.generate_token, name='generate_token'),
-    # path('validate_token/', views.validate_token, name='validate_token'),
+    path('shop', views.products_view, name='Shop'),
+    path('product/<int:product_id>', views.product_view, name='product'),
 ]

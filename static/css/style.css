@@ -519,6 +519,92 @@
     a:hover {
         text-decoration: underline;
     }
+        #features {
+            padding: 100px 20px;
+            background: #f4f4f4;
+            text-align: center;
+        }
+
+        #features h2 {
+            font-size: 2.5rem;
+            margin-bottom: 50px;
+            position: relative;
+        }
+
+        #features h2::after {
+            content: '';
+            width: 80px;
+            height: 5px;
+            background: #4caf50;
+            position: absolute;
+            left: 50%;
+            bottom: -15px;
+            transform: translateX(-50%);
+        }
+
+        #features .feature {
+            display: flex;
+            justify-content: space-around;
+            flex-wrap: wrap;
+            margin-top: 30px;
+        }
+
+        #features .feature-item {
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            margin: 15px;
+            flex-basis: calc(33% - 40px);
+            text-align: center;
+            transition: transform 0.3s;
+        }
+
+        #features .feature-item:hover {
+            transform: translateY(-10px);
+        }
+
+        #features .feature-item i {
+            font-size: 2.5rem;
+            color: #4caf50;
+            margin-bottom: 20px;
+        }
+
+        #features .feature-item h3 {
+            font-size: 1.5rem;
+            margin-bottom: 10px;
+        }
+
+        #download {
+            padding: 100px 20px;
+            background: white;
+            text-align: center;
+        }
+
+        #download h2 {
+            font-size: 2.5rem;
+            margin-bottom: 50px;
+        }
+
+        #download p {
+            font-size: 1.2rem;
+            margin-bottom: 30px;
+        }
+
+        #download a {
+            background-color: #4caf50;
+            color: white;
+            padding: 15px 30px;
+            text-decoration: none;
+            font-size: 1.2rem;
+            border-radius: 5px;
+            transition: background 0.3s, transform 0.3s;
+        }
+
+        #download a:hover {
+            background-color: #388e3c;
+            transform: scale(1.1);
+        }
 
   /* Footer Styles */
   .footer {

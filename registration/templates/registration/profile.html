@@ -1,0 +1,25 @@
+{% extends 'base.html' %}
+
+{% block title %}Profile{% endblock %}
+
+{% load static %}
+
+{% block content %}
+    <div class="text-center mb-5">
+        <h1 class="display-4">User Profile</h1>
+    </div>
+    <div class="profile-card">
+        <h2>{{ user.username }}</h2>
+        <p><strong>Email:</strong> {{ user.email }}</p>
+        <p><strong>Name:</strong> {{ user.first_name }} {{ user.last_name }}</p>
+
+        <div class="button-group">
+            <a href="{% url 'edit_profile' %}" class="btn btn-primary">Edit Profile</a>
+            <form action="{% url 'logout' %}" method="post" style="display:inline;">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-danger">Logout</button>
+            </form>
+            <a href="{% url 'delete_account' %}" class="btn btn-danger">Delete My Account</a>
+        </div>
+    </div>
+{% endblock %}
