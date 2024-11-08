@@ -18,6 +18,7 @@ class Product(models.Model):
     activation_period = models.DurationField(default=timedelta(hours=2))  # Duration field to store time
     image = models.ImageField(upload_to='Photos/%y/%m/%d', default='Photos/24/09/17/images.png')
     download_file = models.FileField(upload_to='Downloads/%y/%m/%d', default=f'Downloads/24/09/17/file{id}.exe')
+    download_file_version = models.CharField(max_length=10, default='1.0.0')
     active = models.BooleanField(default=True)
     category = models.ForeignKey(Category, on_delete=models.PROTECT, null=True, blank=True)
 
