@@ -111,7 +111,7 @@ def start_payment(request, order_id):
         payment_token = generate_payment_url(user_data, auth_token, order_id, settings.PAYMOB_INTEGRATION_ID, amount_cents)
 
         # Retrieve iframe ID from settings for flexibility
-        payment_url = f"https://accept.paymobsolutions.com/api/acceptance/iframes/{settings.PAYMOB_IFRAME_ID}?payment_token={payment_token}"
+        payment_url = f"https://accept.paymob.com/api/acceptance/iframes/{settings.PAYMOB_IFRAME_ID}?payment_token={payment_token}"
         return redirect(payment_url)
     
     except UserProfile.DoesNotExist:

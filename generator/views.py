@@ -20,7 +20,7 @@ import pytz
 logger = logging.getLogger(__name__)
 
 # MongoDB setup
-MONGO_URI = os.getenv('MONGO_URI', 'mongodb+srv://mahmed732005:ddEcRyduRgwFmc3v@cluster0.us288kr.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0')
+MONGO_URI = os.getenv('MONGO_URI', 'mongodb+srv://mahmed732005:ddEcRyduRgwFmc3v@cluster0.r9g62.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0')
 client = MongoClient(MONGO_URI)
 db = client['auth_app']
 tokens_collection = db['tokens']
@@ -91,7 +91,7 @@ def validate_token(request):
     user_id = data.get('user_id')
     if not token:
         return JsonResponse({"error": "Required Key."}, status=400)
-
+    print(data)
     # Check rate limiting
     last_request_time = request.session.get('last_request_time')
     current_time = time()  # Current time as a UNIX timestamp
@@ -124,7 +124,7 @@ def validate_token(request):
         if token_data.get("purpose") != "purchase":
             return JsonResponse({"error": "You need to purchase This Key"}, status=400)
 
-        return JsonResponse({"success": "Login Successfully!"}, status=200)
+        return JsonResponse({"success": "Valid Key, Login Successfully!"}, status=200)
     else:
-        return JsonResponse({"error": "Key not in the database."}, status=404)
+        return JsonResponse({"error": "Invalid Key"}, status=404)
     

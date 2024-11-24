@@ -2,7 +2,7 @@ from django.conf import settings
 import requests
 
 def get_auth_token():
-    url = "https://accept.paymobsolutions.com/api/auth/tokens"
+    url = "https://accept.paymob.com/api/auth/tokens"
     payload = {
         "api_key": settings.PAYMOB_API_KEY
     }
@@ -12,7 +12,7 @@ def get_auth_token():
 
 
 def create_order(auth_token, amount_cents, currency="EGP", items=[]):
-    url = "https://accept.paymobsolutions.com/api/ecommerce/orders"
+    url = "https://accept.paymob.com/api/ecommerce/orders"
     payload = {
         "auth_token": auth_token,
         "delivery_needed": "false",
@@ -26,7 +26,7 @@ def create_order(auth_token, amount_cents, currency="EGP", items=[]):
 
 
 def generate_payment_url(user_data, auth_token, order_id, integration_id, amount_cents):
-    url = f"https://accept.paymobsolutions.com/api/acceptance/payment_keys"
+    url = f"https://accept.paymob.com/api/acceptance/payment_keys"
     payload = {
         "auth_token": auth_token,
         "amount_cents": str(amount_cents),
