@@ -148,7 +148,7 @@ def handle_download(request):
             
             title = downloaded_file_path.split("\\")[-1]
             # After successful download, add the video to the user's playlist
-            playlist_title = "My Playlist"  # Default playlist title, can be customized
+            playlist_title = "Singles"  # Default playlist title, can be customized
             playlist, created = Playlist.objects.get_or_create(user=request.user, title=playlist_title)
 
             # Create a Video object and associate it with the playlist
@@ -162,7 +162,7 @@ def handle_download(request):
 
             # Optionally, you can return a response to show the video details or a success message
             messages.success(request, f"Video '{title}' added to your playlist!")
-            return redirect('get_user_playlists')  # Redirect to the success page or a relevant page
+            return redirect('browse_playlists')  # Redirect to the success page or a relevant page
 
         except Exception as e:
             print(f"Error in handle_download: {str(e)}")
