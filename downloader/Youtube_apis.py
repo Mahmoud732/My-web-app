@@ -55,7 +55,7 @@ def get_video_audio_format(request, url, resolution):
         return None
 
 
-def download_audio(request, url, audio_format, dest, playlist='Singles'):
+def download_audio(request, url, audio_format, dest, playlist_title='Singles'):
     try:
         user_download_folder = os.path.join(settings.MEDIA_ROOT, dest, request.user.username)
 
@@ -72,16 +72,17 @@ def download_audio(request, url, audio_format, dest, playlist='Singles'):
         }
         with yt_dlp.YoutubeDL(ydl_opts) as ydl:
             info = ydl.extract_info(url)
-            file = ydl.prepare_filename(info)
+            filename = ydl.prepare_filename(info)
             filename = os.path.splitext(filename)[0] + '.mp3'
             ydl.download([url])
             absolute_path = os.path.abspath(filename)
             messages.success(request, "Audio download completed!")
-
+            title = absolute_path.split("\\")[-1]
+            playlist, created = Playlist.objects.get_or_create(user=request.user, title=playlist_title)
             # Create a Video object and associate it with the playlist
             media = Media.objects.create(
                 playlist=playlist,
-                title=file,
+                title=title,
                 url=url,
                 resolution='Ultra',
                 file_path=absolute_path  # Store the file path of the downloaded video
