@@ -14,7 +14,7 @@
                     {% for media in playlist.media %}
                         <li>
                             <strong>{{ media.title }}</strong>
-                            <a href="{{ media.download_url }}">Download</a>
+                            <a href="{% url 'download_file' media.download_url %}">Download</a>
                             <span>{{ media.resolution }}</span>
                         </li>
                     {% endfor %}

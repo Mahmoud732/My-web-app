@@ -186,6 +186,4 @@ def download_file(request, file_path):
     if not os.path.exists(full_path):
         raise Http404("File not found.")
 
-    response = FileResponse(open(full_path, 'rb'))
-    response['Content-Disposition'] = f'attachment; filename="{os.path.basename(file_path)}"'
-    return response
+    return FileResponse(open(full_path, 'rb'), as_attachment=True, filename=os.path.basename(file_path))
