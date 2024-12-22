@@ -69,6 +69,21 @@ def is_validate_token(request, email, token):
 def sanitize_filename(filename):
     return re.sub(r'[<>:"/\\|?*]', '', filename)
 
+def get_token(request, user_data):
+    if user_data.refresh_token:
+        # Use existing refresh token to get access token
+        access_token = get_token_from_refresh(user_data.refresh_token)
+    else:
+        # No refresh token exists, retrieve new tokens and save refresh token
+        my_data = retrieve_tokens(request)
+        refresh_token = my_data.get('refresh_token')
+        access_token = my_data.get('access_token')
+        
+        # Save the new refresh token to the user's profile
+        user_data.refresh_token = refresh_token
+        user_data.save()
+    return access_token
+
 @login_required
 def fetch_info(request):
     if request.method == 'POST':
@@ -93,19 +108,7 @@ def fetch_info(request):
 
             # Handle Spotify URL
             if is_valid_spotify_url(url):
-                if user_data.refresh_token:
-                    # Use existing refresh token to get access token
-                    access_token = get_token_from_refresh(user_data.refresh_token)
-                else:
-                    # No refresh token exists, retrieve new tokens and save refresh token
-                    my_data = retrieve_tokens(request)
-                    refresh_token = my_data.get('refresh_token')
-                    access_token = my_data.get('access_token')
-                    
-                    # Save the new refresh token to the user's profile
-                    user_data.refresh_token = refresh_token
-                    user_data.save()
-                print(access_token)
+                access_token = get_token(request, user_data)
                 context = handle_spotify_url(url, access_token)
                 return render(request, 'downloader/InfoPage.html', context)
 
@@ -158,7 +161,8 @@ def handle_download(request):
             # Determine file path
             downloaded_file_path = None
             if is_valid_spotify_url(url):
-                downloaded_file_path = handle_spotify_download(url, dest)
+                access_token = get_token(request, user_data)
+                downloaded_file_path = handle_spotify_download(request, url, dest, access_token)
             elif mediatype == "audio":
                 downloaded_file_path = audio_download_process(request, url, dest)
             else:

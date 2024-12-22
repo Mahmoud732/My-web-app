@@ -63,17 +63,17 @@ def handle_youtube_url(url):
     except Exception as e:
         return {"error": f"Error handling YouTube URL: {e}"}
 
-def handle_spotify_download(url, dest):
+def handle_spotify_download(request, url, dest, access_token):
     try:
         spotify_id = url.split("/")[-1].split("?")[0]
         if is_valid_spotify_playlist_url(url):
-            download_spotify_playlist_tracks(spotify_id, dest)
+            download_spotify_playlist_tracks(request, spotify_id, dest, access_token)
         elif is_valid_spotify_album_url(url):
-            download_album_tracks(spotify_id, dest)
+            download_album_tracks(request, spotify_id, dest, access_token)
         elif is_valid_spotify_artist_url(url):
-            download_artist_top_tracks(spotify_id, dest)
+            download_artist_top_tracks(request, spotify_id, dest, access_token)
         else:
-            download_spotify_track(spotify_id, dest)
+            download_spotify_track(request, spotify_id, dest, access_token)
     except Exception as e:
         raise Exception(f"Spotify download error: {e}")
 
@@ -118,43 +118,23 @@ def process_and_download_tracks(request, tracks, dest, context=""):
         except Exception as e:
             messages.error(None, f"Error during download: {e}")
 
-def download_spotify_track(request, id, dest):
-    try:
-        access_token = get_token_from_refresh(get_refresh_token_from_registry())
-    except:
-        access_token, _ = authenticate_user()
-
+def download_spotify_track(request, id, dest, access_token):
     track_info = get_spotify_track_info(id, access_token)
     process_and_download_tracks(request, [track_info], dest, context="(Single Track)")
 
-def download_album_tracks(request, id, dest):
-    try:
-        access_token = get_token_from_refresh(get_refresh_token_from_registry())
-    except:
-        access_token, _ = authenticate_user()
-
+def download_album_tracks(request, id, dest, access_token):
     album_data = get_spotify_album_tracks_info(id, access_token)
     album_name = album_data['album_name']
     tracks = album_data['tracks']
     process_and_download_tracks(request, tracks, dest, context=f"from album '{album_name}'")
 
-def download_artist_top_tracks(request, id, dest):
-    try:
-        access_token = get_token_from_refresh(get_refresh_token_from_registry())
-    except:
-        access_token, _ = authenticate_user()
-
+def download_artist_top_tracks(request, id, dest, access_token):
     artist_data = get_spotify_artist_top_tracks(id, access_token)
     artist_name = artist_data['artist']
     tracks = artist_data['tracks']
     process_and_download_tracks(request, tracks, dest, context=f"for artist '{artist_name}'")
 
-def download_spotify_playlist_tracks(request, playlist_id, dest):
-    try:
-        access_token = get_token_from_refresh(get_refresh_token_from_registry())
-    except:
-        access_token, _ = authenticate_user()
-
+def download_spotify_playlist_tracks(request, playlist_id, dest, access_token):
     playlist_data = get_spotify_playlist_tracks(playlist_id, access_token)
     playlist_name = playlist_data['playlist_name']
     tracks = playlist_data['tracks']
