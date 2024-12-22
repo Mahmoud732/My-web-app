@@ -9,13 +9,13 @@ from .Validations import (
     is_valid_spotify_playlist_url,
     is_valid_spotify_album_url
 )
-from .AppServer import authenticate_user
 from .Youtube_apis import search_youtube, download_audio, get_audio_format
 from .models import Playlist
 from django.contrib import messages
 import yt_dlp
 import concurrent.futures
 import asyncio
+
 
 def handle_spotify_url(url, access_token):
     id = url.split('/')[-1].split('?')[0]
