@@ -1,0 +1,50 @@
+{% extends 'base.html' %}
+{% block title %}Smart Media Downloader{% endblock %}
+{% load static %}
+{% load custom_filters %}
+
+{% block content %}
+<h1>Your Playlists</h1>
+    <ul>
+        {% for playlist in playlists %}
+            <li>
+                <h3>{{ playlist.title }}</h3>
+                <p>{{ playlist.description }}</p>
+                <ul>
+                    {% for media in playlist.media %}
+                        <li>
+                            <strong>{{ media.title }}</strong>
+                            <a href="{{ media.download_url }}">Download</a>
+                            <span>{{ media.resolution }}</span>
+                        </li>
+                    {% endfor %}
+                </ul>
+            </li>
+        {% endfor %}
+    </ul>
+<style>
+    .download-button {
+        display: inline-block;
+        margin: 5px 0;
+        padding: 8px 15px;
+        color: white;
+        background-color: #007bff;
+        text-decoration: none;
+        border-radius: 4px;
+    }
+
+    .download-button.disabled {
+        background-color: #d3d3d3;
+        pointer-events: none;
+        cursor: not-allowed;
+    }
+
+    .error-message {
+        color: red;
+        font-size: 0.9em;
+        margin-top: 5px;
+    }
+
+</style>
+
+{% endblock %}

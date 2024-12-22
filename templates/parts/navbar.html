@@ -2,7 +2,8 @@
     <nav class="navbar">
         <div class="logo">ShopLogo</div>
         <ul>
-          <li><a href="{% url 'Home' %}">Home</a></li>
+          <li><a href="{% url 'Home_Page' %}">Home</a></li>
+          <li><a href="{% url 'browse_playlists' %}">Playlists</a></li>
           <li><a href="{% url 'Shop' %}">Shop</a></li>
           <li><a href="{% url 'Orders' %}">Orders</a></li>
           {% if user.is_authenticated %} 

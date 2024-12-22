@@ -1,26 +1,30 @@
 from django.shortcuts import render, redirect, get_object_or_404
-from django.contrib import messages
-from django.http import JsonResponse
 from django.contrib.auth.decorators import login_required
 from django.views.decorators.http import require_POST
 from django.views.decorators.csrf import csrf_exempt
+from django.contrib import messages
+from django.http import JsonResponse
 from django.utils import timezone
-from time import time
 from checkout.models import Order
 from generator.models import Token
 from pymongo import MongoClient
 from datetime import timedelta
+from time import time
 import json
 import os
 import secrets
 import logging
 import pytz
+import dotenv
 
 # Set up logging
 logger = logging.getLogger(__name__)
 
+# Setup .env
+dotenv.load_dotenv()
+
 # MongoDB setup
-MONGO_URI = os.getenv('MONGO_URI', 'mongodb+srv://mahmed732005:ddEcRyduRgwFmc3v@cluster0.r9g62.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0')
+MONGO_URI = os.getenv('MONGO_URI')
 client = MongoClient(MONGO_URI)
 db = client['auth_app']
 tokens_collection = db['tokens']

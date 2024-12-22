@@ -1,0 +1,8 @@
+<h1>Media in Folder: {{ folder.name }}</h1>
+<ul>
+    {% for media in media_files %}
+        <li>
+            <a href="{{ media.url }}" download>{{ media.file_name }}</a>
+        </li>
+    {% endfor %}
+</ul>

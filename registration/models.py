@@ -6,6 +6,7 @@ class UserProfile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE, null=True)
     birthday = models.DateField(null=True)
     is_loggedin = models.BooleanField(default=False)
+    token = models.TextField(null=True, unique=True)
 
     def get_age(self):
         if self.birthday is not None:

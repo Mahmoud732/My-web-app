@@ -1,0 +1,114 @@
+{% load custom_filters %}
+{% if video_info or spotify_info %}
+<div class="info-container animated fadeIn">
+    {% if video_info %}
+    <div class="video-info">
+        <div class="info-grid">
+            <div class="info-item">
+                <h6 class="text-muted">Title</h6>
+                <p class="info-text">{{ video_info.title }}</p>
+            </div>
+            <div class="info-item">
+                <h6 class="text-muted">Duration</h6>
+                <p class="info-text">{{ video_info.duration }}</p>
+            </div>
+            <div class="info-item">
+                <h6 class="text-muted">Channel</h6>
+                <p class="info-text"><a href="https://youtube.com/channel/{{ video_info.channel_id }}" target="_blank">{{ video_info.channel }}</a></p>
+            </div>
+            <div class="info-item">
+                <h6 class="text-muted">Views</h6>
+                <p class="info-text">{{ video_info.views }}</p>
+            </div>
+            <div class="info-item">
+                <h6 class="text-muted">Upload Date</h6>
+                <p class="info-text">{{ video_info.upload_date|date:'Y-m-d' }}</p>
+            </div>
+        </div>
+        <div class="action-buttons mt-3">
+            <button class="btn btn-primary" onclick="copyToClipboard('{{ video_info.title }}')">Copy Title</button>
+            <a href="{{ video_info.url }}" class="btn btn-outline-primary" target="_blank">Watch on YouTube</a>
+        </div>
+    </div>
+    {% endif %}
+
+    {% if spotify_info %}
+    <div class="spotify-info">
+        <div class="info-grid">
+            <div class="info-item">
+                <h6 class="text-muted">Title</h6>
+                <p class="info-text">{{ spotify_info.title }}</p>
+            </div>
+            <div class="info-item">
+                <h6 class="text-muted">Artist</h6>
+                <p class="info-text">{{ spotify_info.artist }}</p>
+            </div>
+            <div class="info-item">
+                <h6 class="text-muted">Album</h6>
+                <p class="info-text">{{ spotify_info.album }}</p>
+            </div>
+            <div class="info-item">
+                <h6 class="text-muted">Duration</h6>
+                <p class="info-text">{{ spotify_info.duration }}</p>
+            </div>
+            <div class="info-item">
+                <h6 class="text-muted">Release Date</h6>
+                <p class="info-text">{{ spotify_info.release_date|date:'Y-m-d' }}</p>
+            </div>
+        </div>
+        <div class="action-buttons mt-3">
+            <button class="btn btn-success" onclick="copyToClipboard('{{ spotify_info.title }} - {{ spotify_info.artist }}')">Copy Track Info</button>
+            <a href="{{ spotify_info.url }}" class="btn btn-outline-success" target="_blank">Open in Spotify</a>
+        </div>
+    </div>
+{% endif %}
+</div>
+
+<style>
+.info-container {
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+.info-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 20px;
+}
+.info-item {
+    padding: 10px;
+    border-radius: 4px;
+    background: rgba(0,0,0,0.02);
+}
+.info-text {
+    margin: 0;
+    font-weight: 500;
+}
+.action-buttons {
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+}
+.animated {
+    animation-duration: 0.3s;
+    animation-fill-mode: both;
+}
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+.fadeIn {
+    animation-name: fadeIn;
+}
+</style>
+
+<script>
+function copyToClipboard(text) {
+    navigator.clipboard.writeText(text).then(() => {
+        alert('Copied to clipboard!');
+    }).catch(err => {
+        console.error('Failed to copy:', err);
+    });
+}
+</script>
+{% endif %}

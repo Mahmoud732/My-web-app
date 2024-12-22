@@ -7,9 +7,10 @@ urlpatterns = [
     path('grappelli/', include('grappelli.urls')),
     path('admin/', admin.site.urls),
     path('accounts/', include('registration.urls')),
-    path('', include('app.urls')),
+    path('app', include('app.urls')),
     path('', include('product.urls')),
     path('cart/', include('cart.urls')),
     path('checkout/', include('checkout.urls')),
     path('generator/', include('generator.urls')),
+    path('', include('downloader.urls')),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

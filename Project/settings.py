@@ -63,6 +63,7 @@ INSTALLED_APPS = [
     'cart.apps.CartConfig',
     'checkout.apps.CheckoutConfig',
     'generator.apps.GeneratorConfig',
+    'downloader.apps.DownloaderConfig',
 ]
 
 MIDDLEWARE = [

@@ -11,6 +11,9 @@ logger = logging.getLogger(__name__)
 def home_view(request):
     return render(request, 'app/home.html')
 
+def error_view(request):
+    return render(request, 'app/error.html')
+
 def contact_view(request):
     if request.method == 'POST':
         form = ContactForm(request.POST)

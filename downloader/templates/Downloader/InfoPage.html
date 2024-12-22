@@ -1,0 +1,372 @@
+{% extends 'base.html' %}
+{% block title %}Smart Media Downloader{% endblock %}
+{% load static %}
+{% load custom_filters %}
+
+{% block content %}
+<div class="container my-5">
+    <div class="card shadow-lg rounded-3 border-0 hover-elevate">
+        <div class="card-body p-5">
+            {% if video_info or spotify_info %}
+            <div class="alert alert-success fade show mb-4 d-flex align-items-center animate__animated animate__fadeIn" role="alert">
+                <i class="bi bi-check-circle-fill me-2 fs-4"></i>
+                <div>Media information retrieved successfully!</div>
+                <button type="button" class="btn-close ms-auto" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+            {% endif %}
+
+            <form id="{% if video_info or spotify_info %}DownloadForm{% else %}fetchForm{% endif %}"
+                  method="POST"
+            <form id="{% if video_info or spotify_info %}DownloadForm{% else %}fetchForm{% endif %}" 
+                  method="POST" 
+                  action="{% if video_info or spotify_info %}{% url 'download_page' %}{% else %}{% url 'Home_Page' %}{% endif %}"
+                  class="needs-validation" novalidate>
+                {% csrf_token %}
+                <div class="form-floating mb-4 url-input-wrapper">
+                    <input type="url" id="videoLink" name="video_link"
+                           class="form-control form-control-lg border-2 focus-ring"
+                           placeholder="Enter URL" value="{{ url|default:'' }}"
+                    <input type="url" id="videoLink" name="video_link" 
+                           class="form-control form-control-lg border-2 focus-ring" 
+                           placeholder="Enter URL" value="{{ url|default:'' }}" 
+                           required autocomplete="off"
+                           data-bs-toggle="tooltip"
+                           data-bs-placement="top"
+                           data-bs-toggle="tooltip" 
+                           data-bs-placement="top" 
+                           pattern="https?:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*)"
+                           title="Paste your media URL here">
+                    <label for="videoLink" class="d-flex align-items-center">
+                        <i class="bi bi-link-45deg me-2 text-primary"></i>Enter Media URL
+                    </label>
+                    <div class="invalid-feedback">Please enter a valid URL starting with http:// or https://</div>
+                </div>
+
+                {% if video_info or spotify_info %}
+                <div class="card bg-light mb-4 border-0 animate__animated animate__fadeIn">
+                    <div class="card-body">
+                        <h5 class="card-title mb-3 d-flex align-items-center">
+                            <i class="bi bi-info-square-fill me-2 text-primary"></i>Media Details
+                        </h5>
+                        {% include 'Downloader/media_info_template.html' %}
+                    </div>
+                </div>
+                <div class="row g-4 animate__animated animate__fadeInUp">
+                    {% if video_info %}
+                    <div class="col-md-6">
+                        <div class="form-floating">
+                            <select id="mediaType" name="media_type"
+                            <select id="mediaType" name="media_type" 
+                                    class="form-select custom-select border-2" required>
+                                <option value="video">Video with Audio</option>
+                                <option value="audio">Audio Only (MP3)</option>
+                            </select>
+                            <label for="mediaType" class="text-secondary">Format</label>
+                        </div>
+                    </div>
+                    {% endif %}
+                    <div class="col-md-6">
+                        <div class="form-floating">
+                            <select id="quality" name="quality"
+                            <select id="quality" name="quality" 
+                                    class="form-select custom-select border-2" required>
+                            </select>
+                            <label for="quality" class="text-secondary">Quality</label>
+                        </div>
+                    </div>
+                    <div class="col-12">
+                        <div class="form-floating">
+                            <input type="text" id="customFilename" name="custom_filename"
+                            <input type="text" id="customFilename" name="custom_filename" 
+                                   class="form-control border-2"
+                                   placeholder="Custom filename (optional)">
+                            <label for="customFilename">Custom Filename (optional)</label>
+                        </div>
+                    </div>
+                    <div class="col-12">
+                        <div class="form-check form-switch custom-switch">
+                            <input class="form-check-input" type="checkbox"
+                            <input class="form-check-input" type="checkbox" 
+                                   id="createSubfolder" name="create_subfolder" checked>
+                            <label class="form-check-label ms-2" for="createSubfolder">
+                                Create organized subfolder structure
+                            </label>
+                        </div>
+                    </div>
+                </div>
+                <button type="submit" class="btn btn-primary btn-lg w-100 mt-4 download-btn" id="downloadButton">
+                    <i class="bi bi-download me-2"></i>Start Download
+                    <div class="progress download-progress d-none">
+                        <div class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar"></div>
+                    </div>
+                </button>
+                {% else %}
+                <button type="submit" class="btn btn-primary btn-lg w-100 fetch-btn" id="fetchInfoButton">
+                    <i class="bi bi-search me-2"></i>Fetch Media Info
+                </button>
+                {% endif %}
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Toast Notification -->
+<div class="position-fixed bottom-0 end-0 p-3" style="z-index: 1080">
+    <div id="downloadToast" class="toast custom-toast" role="alert" aria-live="assertive" aria-atomic="true">
+        <div class="toast-header bg-primary text-white">
+            <i class="bi bi-info-circle-fill me-2"></i>
+            <strong class="me-auto">Download Status</strong>
+            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="toast" aria-label="Close"></button>
+        </div>
+        <div class="toast-body">
+            <div class="d-flex align-items-center">
+                <div class="spinner-border spinner-border-sm me-2" role="status"></div>
+                <span id="toastMessage">Download started! You'll be notified when it's complete.</span>
+            </div>
+        </div>
+    </div>
+</div>
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.7.2/font/bootstrap-icons.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const form = document.querySelector('form');
+        const mediaTypeSelect = document.getElementById('mediaType');
+        const qualitySelect = document.getElementById('quality');
+        const downloadButton = document.getElementById('downloadButton');
+        const progressBar = document.querySelector('.progress-bar');
+        const videoInfo = {
+            resolutions: {{ video_info.resolutions|default:"[]"|safe }},
+            bitrates: {{ video_info.bitrates|default:"[]"|safe }},
+            formats: {{ video_info.formats|default:"[]"|safe }}
+        };
+    
+        // Initialize Bootstrap tooltips
+        const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+        tooltipTriggerList.forEach(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl));
+    
+        // Update quality options when media type changes
+        if (mediaTypeSelect) {
+            mediaTypeSelect.addEventListener('change', () => updateQualityOptions(mediaTypeSelect.value));
+            updateQualityOptions(mediaTypeSelect.value);
+        }
+    
+        form.addEventListener('submit', function(e) {
+            // Check if video_info or spotify_info is available to set target="_blank"
+            if (isVideoOrSpotifyAvailable) {
+                form.target = '_blank';  // Open in a new tab if video or spotify info is available
+            } else {
+                form.target = '_self';  // Open in the same tab if not
+            }
+
+            // Check form validity
+            if (!form.checkValidity()) {
+                e.preventDefault();
+                e.stopPropagation();
+                showValidationFeedback();
+            } else if (form.id === 'fetchForm') {
+                handleFetchSubmit();
+            } else {
+                handleDownloadSubmit(e);
+            }
+
+            form.classList.add('was-validated');
+        });
+    
+        function updateQualityOptions(mediaType) {
+            qualitySelect.innerHTML = '';
+            let options = [];
+            
+            if (mediaType === 'video') {
+                options = videoInfo.resolutions.map(res => ({
+                    value: res,
+                    label: `${res} - ${getQualityLabel(res)}`
+                }));
+            } else if (mediaType === 'audio') {
+                options = videoInfo.bitrates.map(rate => ({
+                    value: rate,
+                    label: `${rate} kbps - ${getAudioQualityLabel(rate)}`
+                }));
+            }
+
+            options.forEach(option => {
+                const optionElement = document.createElement('option');
+                optionElement.value = option.value;
+                optionElement.textContent = option.label;
+                qualitySelect.appendChild(optionElement);
+            });
+
+            qualitySelect.classList.add('animate__animated', 'animate__fadeIn');
+        }
+
+        function getQualityLabel(resolution) {
+            resolution = parseInt(resolution);
+            if (resolution >= 2160) return '4K Ultra HD';
+            if (resolution >= 1440) return '2K Quad HD';
+            if (resolution >= 1080) return 'Full HD';
+            if (resolution >= 720) return 'HD';
+            return 'Standard';
+        }
+
+        function getAudioQualityLabel(bitrate) {
+            if (bitrate >= 320) return 'Studio Quality';
+            if (bitrate >= 256) return 'High Quality';
+            if (bitrate >= 192) return 'Good Quality';
+            return 'Standard Quality';
+        }
+
+        async function handleDownloadSubmit(e) {
+            // e.preventDefault();
+            showDownloadStarted();
+            const formData = new FormData(form);
+            downloadButton.disabled = true;
+
+            try {
+                const response = await fetch(form.action, {
+                    method: 'POST',
+                    body: formData,
+                    headers: { 'X-Requested-With': 'XMLHttpRequest' }
+                });
+
+                console.log('Response:', response)
+                if (response.ok) throw new Error('Download failed. Please try again.')
+                    const Download_Link = await response.url
+                    window.open(Download_Link, "_blank");
+                
+            } catch (error) {
+                console.error('Error:', error);
+                showErrorToast('Download failed. Please try again.')
+            } finally {
+                downloadButton.disabled = false
+            }
+
+
+                // if (response.bytes) {
+                //     const data = await response.clone();
+                //     updateDownloadProgress(data);
+                // } else {
+                //     throw new Error('Download failed');
+                // }
+            // } catch (error) {
+            //     showErrorToast('Download failed. Please try again.');
+            // } finally {
+            //     downloadButton.disabled = false;
+            // }
+        }
+
+        function handleFetchSubmit() {
+            const button = document.getElementById('fetchInfoButton');
+            button.disabled = true;
+            button.innerHTML = '<div class="spinner-grow spinner-grow-sm me-2"></div>Fetching...';
+        }
+
+        function showDownloadStarted() {
+            const downloadToast = new bootstrap.Toast(document.getElementById('downloadToast'));
+            downloadToast.show();
+            document.querySelector('.download-progress').classList.remove('d-none');
+        }
+
+        function updateDownloadProgress(data) {
+            progressBar.style.width = `${data.progress}%`;
+            document.getElementById('toastMessage').textContent = data.status;
+
+            if (data.progress < 100) {
+                setTimeout(() => checkProgress(data.taskId), 1000);
+            } else {
+                downloadComplete();
+            }
+        }
+
+        function downloadComplete() {
+            progressBar.style.width = '100%';
+            document.getElementById('toastMessage').textContent = 'Download complete!';
+            setTimeout(() => {
+                document.querySelector('.download-progress').classList.add('d-none');
+                progressBar.style.width = '0%';
+            }, 2000);
+        }
+
+        function showValidationFeedback() {
+            const invalidFields = form.querySelectorAll(':invalid');
+            invalidFields.forEach(field => {
+                field.classList.add('animate__animated', 'animate__shakeX');
+                field.addEventListener('animationend', () => {
+                    field.classList.remove('animate__animated', 'animate__shakeX');
+                });
+            });
+        }
+
+        function showErrorToast(message) {
+            document.getElementById('toastMessage').textContent = message;
+            const toast = new bootstrap.Toast(document.getElementById('downloadToast'));
+            toast.show();
+        }
+    });
+    </script>
+
+
+<style>
+.hover-elevate {
+    transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+}
+
+.hover-elevate:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+}
+
+.custom-select {
+    cursor: pointer;
+}
+
+.download-btn {
+    position: relative;
+    overflow: hidden;
+    transition: all 0.3s ease;
+}
+
+.download-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+}
+
+.download-progress {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 4px;
+    background: rgba(255,255,255,0.2);
+}
+
+.custom-toast {
+    min-width: 350px;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+}
+
+.focus-ring:focus {
+    box-shadow: 0 0 0 0.25rem rgba(13,110,253,0.25);
+}
+
+.custom-switch .form-check-input {
+    height: 1.5rem;
+    width: 3rem;
+}
+
+.progress-bar {
+    transition: width 0.3s ease-in-out;
+}
+
+@media (max-width: 768px) {
+    .card-body {
+        padding: 1.5rem !important;
+    }
+
+    .custom-toast {
+        min-width: 300px;
+    }
+}
+</style>
+{% endblock %}

@@ -1,0 +1,12 @@
+{% extends 'base.html' %}
+
+{% block title %}Downloader{% endblock %}
+
+{% load static %}
+{% load custom_filters %}
+
+{% block content %}
+    <h1>Download Started Successfully!</h1>
+    <p>Your download has been initiated. Please check your destination folder.</p>
+    <a href="{% url 'Home_Page' %}">Go Back to Home Page</a>
+{% endblock %}
