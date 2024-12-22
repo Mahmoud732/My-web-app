@@ -1,5 +1,6 @@
 from .models import Media, Playlist
 from django.contrib import messages
+from django.conf import settings
 from youtubesearchpython import VideosSearch
 import yt_dlp
 import os
@@ -56,6 +57,8 @@ def get_video_audio_format(request, url, resolution):
 
 def download_audio(request, url, audio_format, dest, playlist='Singles'):
     try:
+        user_download_folder = os.path.join(settings.MEDIA_ROOT, dest, request.user.username)
+
         ydl_opts = {
             'format': f"{audio_format['format_id']}",
             'postprocessors': [
@@ -65,7 +68,7 @@ def download_audio(request, url, audio_format, dest, playlist='Singles'):
                     'preferredquality': '192',
                 }
             ],
-            'outtmpl': f"{dest}/%(title)s.%(ext)s",
+            'outtmpl': f"{user_download_folder}/%(title)s.%(ext)s",
         }
         with yt_dlp.YoutubeDL(ydl_opts) as ydl:
             info = ydl.extract_info(url)
@@ -91,10 +94,12 @@ def download_audio(request, url, audio_format, dest, playlist='Singles'):
 
 def download_video(request, url, video_format, audio_format, dest):
     try:
+        user_download_folder = os.path.join(settings.MEDIA_ROOT, dest, request.user.username)
+
         ydl_opts = {
             'format': f"{video_format['format_id']}+{audio_format['format_id']}",
             'merge_output_format': 'mp4',
-            'outtmpl': f"{dest}/%(title)s - [%(height)s]p.%(ext)s",
+            'outtmpl': f"{user_download_folder}/%(title)s - [%(height)s]p.%(ext)s",
         }
         with yt_dlp.YoutubeDL(ydl_opts) as ydl:
             info = ydl.extract_info(url)
