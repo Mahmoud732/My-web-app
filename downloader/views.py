@@ -168,7 +168,7 @@ def handle_download(request):
             else:
                 video_format, audio_format = get_video_audio_format(request, url, resolution)
                 if video_format and audio_format:
-                    downloaded_file_path = download_video(request, url, video_format, audio_format, dest)
+                    downloaded_file_path = download_video(request, url, resolution, video_format, audio_format, dest)
 
             # Optionally, you can return a response to show the video details or a success message
             messages.success(request, f"Video '{title}' added to your playlist!")

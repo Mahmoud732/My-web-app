@@ -92,7 +92,7 @@ def download_audio(request, url, audio_format, dest, playlist='Singles'):
         return None
 
 
-def download_video(request, url, video_format, audio_format, dest):
+def download_video(request, url, resuloution, video_format, audio_format, dest):
     try:
         user_download_folder = os.path.join(settings.MEDIA_ROOT, dest, request.user.username)
 
@@ -120,7 +120,7 @@ def download_video(request, url, video_format, audio_format, dest):
                 playlist=playlist,
                 title=title,
                 url=url,
-                resolution='%(height)s',
+                resolution= resuloution,
                 file_path=absolute_path  # Store the file path of the downloaded video
             )
             return

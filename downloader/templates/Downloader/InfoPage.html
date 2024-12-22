@@ -135,8 +135,6 @@
         const form = document.querySelector('form');
         const mediaTypeSelect = document.getElementById('mediaType');
         const qualitySelect = document.getElementById('quality');
-        const downloadButton = document.getElementById('downloadButton');
-        const progressBar = document.querySelector('.progress-bar');
         const videoInfo = {
             resolutions: {{ video_info.resolutions|default:"[]"|safe }},
             bitrates: {{ video_info.bitrates|default:"[]"|safe }},
@@ -218,10 +216,11 @@
         }
 
         async function handleDownloadSubmit(e) {
-            // e.preventDefault();
+            const button = document.getElementById('downloadButton');
             showDownloadStarted();
             const formData = new FormData(form);
-            downloadButton.disabled = true;
+            button.disabled = true;
+            button.innerHTML = '<div class="spinner-grow spinner-grow-sm me-2"></div>Fetching...';
 
             try {
                 const response = await fetch(form.action, {
