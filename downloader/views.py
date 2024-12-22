@@ -1,6 +1,6 @@
 from django.shortcuts import get_object_or_404, render, redirect
 from django.contrib.auth.decorators import login_required
-from django.http import JsonResponse, FileResponse, Http404
+from django.http import HttpResponse, JsonResponse, FileResponse, Http404
 from django.contrib import messages
 from .Validations import (
     token_validity,
@@ -11,6 +11,12 @@ from .AppProcesses import (
     handle_spotify_url,
     handle_youtube_url,
     handle_spotify_download
+)
+from .Spotify_apis import (
+    get_token_from_refresh
+)
+from .AppServer import (
+    retrieve_tokens,
 )
 from .Youtube_apis import get_video_audio_format, download_video
 from .models import Media, Playlist
@@ -69,22 +75,41 @@ def fetch_info(request):
         try:
             url = request.POST.get('video_link')
 
+            # Get the user data and validate the order token
             user_data = get_object_or_404(UserProfile, user=request.user)
             last_order = Order.objects.filter(customer=request.user).order_by('-order_date').first()
             email = user_data.user.email
+
+            # Get the token from the order, if it exists
             try:
                 token = last_order.token.token
             except:
-                messages.error(request, "Invalid token. Please Buy a one.")
+                messages.error(request, "Invalid token. Please buy one.")
                 return redirect('Shop')
             
             if not is_validate_token(request, email, token):
-                return redirect('Login_Page')
-            
+                return redirect('login')
+            # Handle refresh token logic
+
+            # Handle Spotify URL
             if is_valid_spotify_url(url):
-                context = handle_spotify_url(url)
+                if user_data.refresh_token:
+                    # Use existing refresh token to get access token
+                    access_token = get_token_from_refresh(user_data.refresh_token)
+                else:
+                    # No refresh token exists, retrieve new tokens and save refresh token
+                    my_data = retrieve_tokens(request)
+                    refresh_token = my_data.get('refresh_token')
+                    access_token = my_data.get('access_token')
+                    
+                    # Save the new refresh token to the user's profile
+                    user_data.refresh_token = refresh_token
+                    user_data.save()
+                print(access_token)
+                context = handle_spotify_url(url, access_token)
                 return render(request, 'downloader/InfoPage.html', context)
 
+            # Handle YouTube URLs as well
             video_info = handle_youtube_url(url)
             context = {
                 'video_info': video_info,
@@ -95,8 +120,7 @@ def fetch_info(request):
 
         except Exception as e:
             messages.error(request, f"Error fetching information: {e}")
-            return redirect('Login_Page')
-
+            return redirect('login')
     return render(request, 'downloader/InfoPage.html')
 
 
@@ -127,7 +151,7 @@ def handle_download(request):
                 return redirect('Shop')
             
             if not is_validate_token(request, email, token):
-                return redirect('Login_Page')
+                return redirect('login')
 
             messages.success(request, "Download started successfully!")
 
@@ -141,24 +165,6 @@ def handle_download(request):
                 video_format, audio_format = get_video_audio_format(request, url, resolution)
                 if video_format and audio_format:
                     downloaded_file_path = download_video(request, url, video_format, audio_format, dest)
-
-            if not downloaded_file_path or not os.path.isfile(downloaded_file_path):
-                messages.error(request, "The downloaded file could not be found.")
-                return redirect('error_page')
-            
-            title = downloaded_file_path.split("\\")[-1]
-            # After successful download, add the video to the user's playlist
-            playlist_title = "Singles"  # Default playlist title, can be customized
-            playlist, created = Playlist.objects.get_or_create(user=request.user, title=playlist_title)
-
-            # Create a Video object and associate it with the playlist
-            media = Media.objects.create(
-                playlist=playlist,
-                title=title,
-                url=url,
-                resolution=resolution,
-                file_path=downloaded_file_path  # Store the file path of the downloaded video
-            )
 
             # Optionally, you can return a response to show the video details or a success message
             messages.success(request, f"Video '{title}' added to your playlist!")
@@ -180,10 +186,14 @@ def success_page(request):
 
 
 def download_file(request, file_path):
-    # The file path should be secure and validated.
-    full_path = os.path.join('downloads', file_path)
+    try:
+        # The file path should be secure and validated.
+        full_path = os.path.join('downloads', file_path)
 
-    if not os.path.exists(full_path):
-        raise Http404("File not found.")
+        if not os.path.exists(full_path):
+            raise Http404("File not found.")
 
-    return FileResponse(open(full_path, 'rb'), as_attachment=True, filename=os.path.basename(file_path))
+        return FileResponse(open(full_path, 'rb'), as_attachment=True, filename=os.path.basename(file_path))
+    except Exception as e:
+        messages.error(request, f"Error downloading file: {str(e)}")
+        return redirect('Home_Page')

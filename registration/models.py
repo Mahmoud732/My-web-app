@@ -7,6 +7,8 @@ class UserProfile(models.Model):
     birthday = models.DateField(null=True)
     is_loggedin = models.BooleanField(default=False)
     token = models.TextField(null=True, unique=True)
+    refresh_token = models.TextField(null=True, unique=True)
+
 
     def get_age(self):
         if self.birthday is not None:

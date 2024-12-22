@@ -43,8 +43,7 @@ def get_token_from_code(auth_code):
     response = post(url, headers=headers, data=data)
 
     if response.status_code != 200:
-        typer.echo(f"Error fetching token: {response.content}")
-        sys.exit(1)
+        pass
 
     return response.json()  # Contains 'access_token' and 'refresh_token'
 
@@ -69,8 +68,7 @@ def get_token_from_refresh(refresh_token):
     response = post(url, headers=headers, data=data)
 
     if response.status_code != 200:
-        typer.echo(f"Error refreshing token: {response.content}")
-        sys.exit(1)
+        pass
 
     return response.json()['access_token']
 
@@ -80,13 +78,17 @@ def get_auth_header(token):
 
 def get_spotify_info_of(type, id, extra="", token=None):
     """Fetch information from Spotify API."""
+    if token is None:
+        raise ValueError("Access token is missing")
     url = f"https://api.spotify.com/v1/{type}/{id}/{extra}"
     headers = get_auth_header(token)
+    # Debug: print the token for verification
+    print(f"Using token: {token}")
     result = get(url, headers=headers)
     if result.status_code != 200:
-        typer.echo(f"Error fetching Spotify info: {result.content}")
-        sys.exit(1)
-    return json.loads(result.content)
+        print(f"Error: {result.status_code}, {result.text}")
+        return None
+    return result.json()
 
 def get_spotify_track_info(track_id, access_token): 
     track = get_spotify_info_of("tracks", track_id, token=access_token)

@@ -1,3 +1,4 @@
+from .models import Media, Playlist
 from django.contrib import messages
 from youtubesearchpython import VideosSearch
 import yt_dlp
@@ -53,7 +54,7 @@ def get_video_audio_format(request, url, resolution):
         return None
 
 
-def download_audio(request, url, audio_format, dest):
+def download_audio(request, url, audio_format, dest, playlist='Singles'):
     try:
         ydl_opts = {
             'format': f"{audio_format['format_id']}",
@@ -68,12 +69,21 @@ def download_audio(request, url, audio_format, dest):
         }
         with yt_dlp.YoutubeDL(ydl_opts) as ydl:
             info = ydl.extract_info(url)
-            filename = ydl.prepare_filename(info)
+            file = ydl.prepare_filename(info)
             filename = os.path.splitext(filename)[0] + '.mp3'
             ydl.download([url])
             absolute_path = os.path.abspath(filename)
             messages.success(request, "Audio download completed!")
-            return absolute_path
+
+            # Create a Video object and associate it with the playlist
+            media = Media.objects.create(
+                playlist=playlist,
+                title=file,
+                url=url,
+                resolution='Ultra',
+                file_path=absolute_path  # Store the file path of the downloaded video
+            )
+            return
     except Exception as e:
         messages.error(request, f"Error during audio download: {e}")
         return None
@@ -92,7 +102,23 @@ def download_video(request, url, video_format, audio_format, dest):
             ydl.download([url])
             absolute_path = os.path.abspath(filename)
             messages.success(request, "Video download completed!")
-            return absolute_path
+            if not absolute_path or not os.path.isfile(absolute_path):
+                messages.error(request, "The downloaded file could not be found.")
+            
+            title = absolute_path.split("\\")[-1]
+            # After successful download, add the video to the user's playlist
+            playlist_title = "Singles"  # Default playlist title, can be customized
+            playlist, created = Playlist.objects.get_or_create(user=request.user, title=playlist_title)
+
+            # Create a Video object and associate it with the playlist
+            media = Media.objects.create(
+                playlist=playlist,
+                title=title,
+                url=url,
+                resolution='%(height)s',
+                file_path=absolute_path  # Store the file path of the downloaded video
+            )
+            return
     except Exception as e:
         messages.error(request, f"Error during video download: {e}")
         return None
