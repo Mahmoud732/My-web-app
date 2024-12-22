@@ -1,9 +1,7 @@
 
 from .Appsecurity import *
 import os
-import sys
 import base64
-import json
 from requests import get, post
 
 def generate_auth_url():

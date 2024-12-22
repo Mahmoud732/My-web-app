@@ -1,6 +1,6 @@
 from django.shortcuts import get_object_or_404, render, redirect
 from django.contrib.auth.decorators import login_required
-from django.http import HttpResponse, JsonResponse, FileResponse, Http404
+from django.http import FileResponse, Http404
 from django.contrib import messages
 from .Validations import (
     token_validity,
