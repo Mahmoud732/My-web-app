@@ -16,26 +16,27 @@
             {% endif %}
             
             <form id="{% if not user_data.is_spotify_autherized %}AuthForm
-            {% elif not video_info or not spotify_info %}fetchForm
+            {% elif not video_info and not spotify_info %}fetchForm
             {% else %}DownloadForm
             {% endif %}" 
-                  method="POST" 
+            method="POST" 
                   action="{% if not user_data.is_spotify_autherized %}{% url 'spotify_auth' %}
-                  {% elif not video_info or not spotify_info %}{% url 'Home_Page' %}
+                  {% elif not video_info and not spotify_info %}{% url 'Home_Page' %}
                   {% else %}{% url 'download_page' %}
                   {% endif %}"
                   class="needs-validation" novalidate>
                 {% csrf_token %}
 
                 {% if not user_data.is_spotify_autherized %}
-                    <!-- Spotify Authorization Button -->
+                <!-- Spotify Authorization Button -->
+                <p>Please authorize with Spotify first</p>
                     <button type="submit" class="btn btn-primary btn-lg w-100 Auth-btn" id="authButton">
                         <i class="bi bi-search me-2"></i>Authorize Spotify Account
                     </button>
                 {% else %}
                     <!-- Form to fetch video info -->
                     <div class="form-floating mb-4 url-input-wrapper">
-                        <input type="url" id="videoLink" name="video_link" 
+                        <input type="url" id="videoLink" name="media_link" 
                                class="form-control form-control-lg border-2 focus-ring"
                                placeholder="Enter URL" value="{{ url|default:'' }}"
                                required autocomplete="off"
@@ -49,9 +50,8 @@
                         <div class="invalid-feedback">Please enter a valid URL starting with http:// or https://</div>
                     </div>
 
-                    {% if not video_info or not spotify_info %}
+                    {% if not video_info and not spotify_info %}
                         <!-- Fetch Media Info Button -->
-                        <p>Please authorize with Spotify first</p>
                         <button type="submit" class="btn btn-primary btn-lg w-100 fetch-btn" id="fetchInfoButton">
                             <i class="bi bi-search me-2"></i>Fetch Media Info
                         </button>
@@ -67,22 +67,23 @@
                         </div>
 
                         <div class="row g-4 animate__animated animate__fadeInUp">
-                            {% if video_info %}
-                                <div class="col-md-6">
-                                    <div class="form-floating">
-                                        <select id="mediaType" name="media_type" class="form-select custom-select border-2" required>
-                                            <option value="video">Video with Audio</option>
+                            <div class="col-md-6">
+                                <div class="form-floating">
+                                    <select id="mediaType" name="media_type" class="form-select custom-select border-2" required>
+                                            {% if video_info %}
+                                                <option value="video">Video with Audio</option>
+                                            {% endif %}
                                             <option value="audio">Audio Only (MP3)</option>
                                         </select>
                                         <label for="mediaType" class="text-secondary">Format</label>
                                     </div>
                                 </div>
-                            {% endif %}
 
                             <div class="col-md-6">
                                 <div class="form-floating">
                                     <select id="quality" name="quality" class="form-select custom-select border-2" required>
                                         <!-- Quality options will be filled dynamically -->
+                                         <option value="Ultra" selected>Ultra</option>
                                     </select>
                                     <label for="quality" class="text-secondary">Quality</label>
                                 </div>
@@ -152,6 +153,10 @@
             bitrates: {{ video_info.bitrates|default:"[]"|safe }},
             formats: {{ video_info.formats|default:"[]"|safe }}
         };
+        const spotifyInfo = {
+            type: {{ spotify_info.type|default:"[]"|safe }},
+            bitrates: ['320']
+        };
 
         // Initialize Bootstrap tooltips
         const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
@@ -195,22 +200,26 @@
             window.open(authUrl, '_blank');
         });
 
-        function updateQualityOptions(mediaType) {
-            qualitySelect.innerHTML = '';
+        function updateQualityOptions(mediaType, spotifyInfo = false) {
+            qualitySelect.innerHTML = ''; // Clear existing options
             let options = [];
-            
+            console.log('Spotify Info:', spotifyInfo);
+
             if (mediaType === 'video') {
                 options = videoInfo.resolutions.map(res => ({
                     value: res,
                     label: `${res} - ${getQualityLabel(res)}`
                 }));
-            } else if (mediaType === 'audio') {
+            } else if (mediaType === 'audio' && !spotifyInfo.type) {
                 options = videoInfo.bitrates.map(rate => ({
                     value: rate,
                     label: `${rate} kbps - ${getAudioQualityLabel(rate)}`
                 }));
-            }
-
+            } else {
+                options = spotifyInfo.bitrates.map(rate => ({
+                    value: rate,
+                    label: `${rate} kbps - ${getAudioQualityLabel(rate)}`
+                }));
             options.forEach(option => {
                 const optionElement = document.createElement('option');
                 optionElement.value = option.value;
@@ -218,8 +227,9 @@
                 qualitySelect.appendChild(optionElement);
             });
 
+            // Add animation
             qualitySelect.classList.add('animate__animated', 'animate__fadeIn');
-        }
+        }}
 
         function getQualityLabel(resolution) {
             resolution = parseInt(resolution);

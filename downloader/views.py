@@ -72,7 +72,7 @@ def fetch_info(request):
     user_data = get_object_or_404(UserProfile, user=request.user)
     if request.method == 'POST':
         try:
-            url = request.POST.get('video_link')
+            url = request.POST.get('media_link')
 
             # Get the user data and validate the order token
             user_data = get_object_or_404(UserProfile, user=request.user)
@@ -92,19 +92,21 @@ def fetch_info(request):
 
             # Handle Spotify URL
             if is_valid_spotify_url(url):
+                print("access_token")
                 access_token = get_token(request, user_data)
                 context = handle_spotify_url(url, access_token)
                 context = {
                 'user_data': user_data,
                 'spotify_info': context,
                 'url': url,
+                'quality': 'Ultra',
                 }
-                print(context)
                 return render(request, 'downloader/InfoPage.html', context)
 
             # Handle YouTube URLs as well
             video_info = handle_youtube_url(url)
             context = {
+                'user_data': user_data,
                 'video_info': video_info,
                 'url': url,
             }
@@ -122,12 +124,13 @@ def handle_download(request):
     if request.method == 'POST':
         try:
             # Fetch data from request
-            url = request.POST.get('video_link')
+            url = request.POST.get('media_link')
+
             if not url:
                 messages.error(request, "Video link is required.")
                 return redirect('fetch_info_page')
 
-            resolution = request.POST.get('quality')  # E.g., '1920'
+            resolution = request.POST.get('quality')
             dest = os.path.abspath('./downloads')
             mediatype = request.POST.get('media_type', 'video')
             custom_filename = request.POST.get('custom_filename', '')
@@ -136,7 +139,6 @@ def handle_download(request):
             user_data = get_object_or_404(UserProfile, user=request.user)
             last_order = Order.objects.filter(customer=request.user).order_by('-order_date').first()
             email = user_data.user.email
-
             try:
                 token = last_order.token.token
             except:
@@ -149,16 +151,15 @@ def handle_download(request):
             messages.success(request, "Download started successfully!")
 
             # Determine file path
-            downloaded_file_path = None
             if is_valid_spotify_url(url):
                 access_token = get_token(request, user_data)
-                downloaded_file_path = handle_spotify_download(request, url, dest, access_token)
+                handle_spotify_download(request, url, dest, access_token)
             elif mediatype == "audio":
-                downloaded_file_path = audio_download_process(request, url, dest)
+                audio_download_process(request, url, dest)
             else:
                 video_format, audio_format = get_video_audio_format(request, url, resolution)
                 if video_format and audio_format:
-                    downloaded_file_path = download_video(request, url, resolution, video_format, audio_format, dest)
+                    download_video(request, url, resolution, video_format, audio_format, dest)
 
             # Optionally, you can return a response to show the video details or a success message
             messages.success(request, f"Video '{title}' added to your playlist!")

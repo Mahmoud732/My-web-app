@@ -34,25 +34,65 @@
 
     {% if spotify_info %}
     <div class="spotify-info">
-        <div class="info-grid">
-            <div class="thumbnail">
-                <img src="{{ spotify_info.thumbnail }}" alt="Thumbnail" class="img-fluid">
-            </div>
-            <div class="info-item">
-                <h6 class="text-muted">Title</h6>
-                <p class="info-text">{{ spotify_info.track_name }}</p>
-            </div>
-            <div class="info-item">
-                <h6 class="text-muted">Artist</h6>
-                <p class="info-text">{{ spotify_info.artist_name }}</p>
+        <!-- General Thumbnail and Title -->
+        <div class="media-details card shadow-lg p-4">
+            <div class="text-center mb-4">        
+                <img src="{{ spotify_info.tracks.thumbnail }}" alt="Thumbnail" class="img-fluid rounded shadow-sm" style="max-width: 200px;">
+                <h2 class="mt-3 text-primary">{{ spotify_info.tracks.name }}</h2>
             </div>
         </div>
-        <div class="action-buttons mt-3">
-            <button class="btn btn-success" onclick="copyToClipboard('{{ spotify_info.title }} - {{ spotify_info.artist }}')">Copy Track Info</button>
-            <a href="{{ spotify_info.url }}" class="btn btn-outline-success" target="_blank">Open in Spotify</a>
+    
+        <!-- Playlist Details -->
+        {% if spotify_info.type == "playlist" and spotify_info.playlist_info %}
+        <div class="playlist-info mt-4">
+            <h5 class="text-muted">Playlist: {{ spotify_info.playlist_info.playlist_name }}</h5>
+            <ul class="list-group mt-3">
+                {% for track in spotify_info.playlist_info.tracks %}
+                <li class="list-group-item">
+                    <strong>{{ track.track_name }}</strong> - {{ track.artist }}
+                </li>
+                {% endfor %}
+            </ul>
+        </div>
+        
+        <!-- Album Tracks -->
+        {% elif spotify_info.type == "album" and spotify_info.tracks %}
+        <div class="album-tracks mt-4">
+            <h4 class="text-muted text-center mb-4">Album Tracks</h5>
+                <ul class="list-group list-group-flush">
+                    {% for track in spotify_info.tracks.tracks %}
+                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                        <span class="track-title font-weight-bold">{{ track.track_name }} -> </span> <small class="text-muted"> {{ track.artist_name }}</small>
+                    </li>
+                    {% endfor %}
+            </ul>
+        </div>
+    
+        <!-- Artist Top Tracks -->
+        {% elif spotify_info.type == "artist" and spotify_info.artist_top_tracks %}
+        <div class="artist-top-tracks mt-4">
+            <h5 class="text-muted">Top Tracks by Artist</h5>
+            <ul class="list-group">
+                {% for track in spotify_info.artist_top_tracks %}
+                <li class="list-group-item">
+                    <a href="{{ track.url }}" target="_blank">
+                        <strong>{{ track.track_name }}</strong>
+                    </a>
+                </li>
+                {% endfor %}
+            </ul>
+        </div>
+        {% endif %}
+        
+        <!-- Spotify URL -->
+        <div class="text-center mt-4">
+            <a href="{{ url }}"  class="btn btn-success btn-lg shadow-sm" target="_blank">
+                <i class="fab fa-spotify"></i> Open in Spotify
+            </a>
         </div>
     </div>
-{% endif %}
+    {% endif %}    
+
 </div>
 
 <style>

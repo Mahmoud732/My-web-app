@@ -79,13 +79,10 @@ def get_token_from_refresh(refresh_token):
 def get_token(request, user_data):
     if user_data.refresh_token:
         # Use existing refresh token to get access token
-        print("from refresh")
         access_token = get_token_from_refresh(user_data.refresh_token)
     else:
         # No refresh token exists, retrieve new tokens and save refresh token
-        print('new access')
         my_data = retrieve_tokens(request)
-        print(my_data)
         refresh_token = my_data.get('refresh_token')
         access_token = my_data.get('access_token')
         
@@ -113,7 +110,7 @@ def retrieve_tokens(request):
         return authenticate_user(request)  # Redirect if no auth code is found
     
     code = request.session.get('auth_code')
-    print(code)
+
     if not code:
         return HttpResponse("Authorization code not found!", status=400)
 
@@ -130,7 +127,7 @@ def retrieve_tokens(request):
             "access_token": access_token,
             "refresh_token": refresh_token
         }
-        print(response_data)
+
         return JsonResponse(response_data)  # Returning as JSON
         
     except Exception as e:
@@ -176,7 +173,7 @@ def get_spotify_info_of(type, id, extra="", token=None):
     url = f"https://api.spotify.com/v1/{type}/{id}/{extra}"
     headers = get_auth_header(token)
     # Debug: print the token for verification
-    print(f"Using token: {token}")
+
     result = get(url, headers=headers)
     if result.status_code != 200:
         print(f"Error: {result.status_code}, {result.text}")
@@ -184,53 +181,60 @@ def get_spotify_info_of(type, id, extra="", token=None):
     return result.json()
 
 def get_spotify_track_info(track_id, access_token): 
+    """Fetch a single track's info."""
     track = get_spotify_info_of("tracks", track_id, token=access_token)
 
     track_name = track['name']
     artist_name = track['artists'][0]['name']
+    thumbnail = track['album']['images'][0]['url']  # Album image for the track
     
-    return [{'track_name': track_name, 'artist_name': artist_name}]
+    return {'thumbnail': thumbnail, 'track_name': track_name, 'artist_name': artist_name}
 
 def get_spotify_album_tracks_info(album_id, access_token):
-    """Fetch tracks from a Spotify album."""
+    """Fetch tracks and thumbnail for a Spotify album."""
     album_data = get_spotify_info_of("albums", album_id, token=access_token)
 
     album_thumbnail = album_data['images'][0]['url']
     album_name = album_data['name']
 
-    album_tracks = get_spotify_info_of("albums", album_id, "tracks", token=access_token)
+    album_tracks = album_data['tracks']['items']
+    tracks = [
+        {'track_name': track['name'], 'artist_name': track['artists'][0]['name']}
+        for track in album_tracks
+    ]
 
-    return {'album_image': album_thumbnail, 'album_name':album_name, 'tracks':[
-        {'image_url': album_data['album']['images']['url'], 'track_name': track['name'], 'artist_name': track['artists'][0]['name']}
-        for track in album_tracks['items']
-    ]}
+    return {'thumbnail': album_thumbnail, 'name': album_name, 'tracks': tracks}
 
 def get_spotify_artist_top_tracks(artist_id, access_token):
-    """Fetch all albums and their tracks for a Spotify artist."""
-    my_data = get_spotify_info_of("albums", artist_id, token=access_token)
-
-    artist_thumbnail = my_data['images'][0]['url']
-    artist_name = my_data['name']
+    """Fetch top tracks for a Spotify artist."""
+    artist_data = get_spotify_info_of("artists", artist_id, token=access_token)
+    artist_thumbnail = artist_data['images'][0]['url']
+    artist_name = artist_data['name']
     
-    tracks = get_spotify_info_of('artists', artist_id, 'top-tracks', token=access_token)
+    tracks_data = get_spotify_info_of('artists', artist_id, 'top-tracks', token=access_token)
 
-    return {'artist':artist_name, 'tracks':[
-        {'image_url': my_data['album']['images']['url'], 'track_name': track['name'], 'artist_name': track['artists'][0]['name'], "artist_thumbnail": artist_thumbnail}
-        for track in tracks['tracks']
-    ]}
+    tracks = [
+        {'track_name': track['name'], 'artist_name': track['artists'][0]['name']}
+        for track in tracks_data['tracks']
+    ]
+
+    return {'thumbnail': artist_thumbnail, 'name': artist_name, 'tracks': tracks}
 
 def get_spotify_playlist_tracks(playlist_id, access_token):
     """Fetch all tracks from a Spotify playlist."""
-    playlist_info = get_spotify_info_of('playlists', playlist_id, token=access_token)
-    playlist_name = playlist_info['name']
+    playlist_data = get_spotify_info_of('playlists', playlist_id, token=access_token)
+    playlist_thumbnail = playlist_data['images'][0]['url']
+    playlist_name = playlist_data['name']
 
-    tracks = get_spotify_info_of("playlists", playlist_id, "tracks", token=access_token)
+    tracks_data = playlist_data['tracks']['items']
 
-    track_info = []
-    for item in tracks['items']:
-        image = item['album']['images']['url']
-        track_name = item['track']['name']
-        artist_name = item['track']['artists'][0]['name']
-        track_info.append({'image_url': image, 'track_name': track_name, 'artist': artist_name})
+    tracks = [
+        {
+            'track_name': item['track']['name'],
+            'artist_name': item['track']['artists'][0]['name'],
+            'thumbnail': item['track']['album']['images'][0]['url']  # Thumbnail for each track
+        }
+        for item in tracks_data
+    ]
 
-    return {'playlist_name': playlist_name, 'tracks': track_info}
+    return {'thumbnail': playlist_thumbnail, 'name': playlist_name, 'tracks': tracks}

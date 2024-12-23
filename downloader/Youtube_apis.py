@@ -1,17 +1,35 @@
 from .models import Media, Playlist
 from django.contrib import messages
 from django.conf import settings
-from youtubesearchpython import VideosSearch
+from googleapiclient.discovery import build
 import yt_dlp
 import os
+from dotenv import load_dotenv
 
+load_dotenv()
 
-def search_youtube(query):
+def search_youtube(request, query):
     try:
-        videos_search = VideosSearch(query, limit=1)
-        result = videos_search.result().get('result', [])
-        return result[0]['link'] if result else None
+        api_key = os.getenv('YOUTUBE_API_KEY')  # Replace with your actual API key
+        youtube = build('youtube', 'v3', developerKey=api_key)
+
+        # Perform the search
+        request = youtube.search().list(
+            part="snippet",
+            q=query,
+            type="video",
+            maxResults=1
+        )
+        response = request.execute()
+
+        # Extract video link
+        if response['items']:
+            video_id = response['items'][0]['id']['videoId']
+            return f"https://www.youtube.com/watch?v={video_id}"
+        else:
+            return None
     except Exception as e:
+        messages.error(request, f"Error: {e}")
         return None
 
 
@@ -55,8 +73,9 @@ def get_video_audio_format(request, url, resolution):
         return None
 
 
-def download_audio(request, url, audio_format, dest, playlist_title='Singles'):
+def download_audio(request, url, audio_format, dest, playlist):
     try:
+        playlist = 'Singles' if playlist is None else playlist
         user_download_folder = os.path.join(settings.MEDIA_ROOT, dest, request.user.username)
 
         ydl_opts = {
@@ -78,7 +97,7 @@ def download_audio(request, url, audio_format, dest, playlist_title='Singles'):
             absolute_path = os.path.abspath(filename)
             messages.success(request, "Audio download completed!")
             title = absolute_path.split("\\")[-1]
-            playlist, created = Playlist.objects.get_or_create(user=request.user, title=playlist_title)
+            playlist, created = Playlist.objects.get_or_create(user=request.user, title=playlist)
             # Create a Video object and associate it with the playlist
             media = Media.objects.create(
                 playlist=playlist,
