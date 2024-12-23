@@ -8,6 +8,7 @@ class UserProfile(models.Model):
     is_loggedin = models.BooleanField(default=False)
     token = models.TextField(null=True, unique=True)
     refresh_token = models.TextField(null=True, unique=True)
+    is_spotify_autherized = models.BooleanField(default=False)
 
 
     def get_age(self):

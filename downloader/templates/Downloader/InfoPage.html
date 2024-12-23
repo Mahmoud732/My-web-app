@@ -8,107 +8,119 @@
     <div class="card shadow-lg rounded-3 border-0 hover-elevate">
         <div class="card-body p-5">
             {% if video_info or spotify_info %}
-            <div class="alert alert-success fade show mb-4 d-flex align-items-center animate__animated animate__fadeIn" role="alert">
-                <i class="bi bi-check-circle-fill me-2 fs-4"></i>
-                <div>Media information retrieved successfully!</div>
-                <button type="button" class="btn-close ms-auto" data-bs-dismiss="alert" aria-label="Close"></button>
-            </div>
+                <div class="alert alert-success fade show mb-4 d-flex align-items-center animate__animated animate__fadeIn" role="alert">
+                    <i class="bi bi-check-circle-fill me-2 fs-4"></i>
+                    <div>Media information retrieved successfully!</div>
+                    <button type="button" class="btn-close ms-auto" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
             {% endif %}
-
-            <form id="{% if video_info or spotify_info %}DownloadForm{% else %}fetchForm{% endif %}"
-                  method="POST"
-            <form id="{% if video_info or spotify_info %}DownloadForm{% else %}fetchForm{% endif %}" 
+            
+            <form id="{% if not user_data.is_spotify_autherized %}AuthForm
+            {% elif not video_info or not spotify_info %}fetchForm
+            {% else %}DownloadForm
+            {% endif %}" 
                   method="POST" 
-                  action="{% if video_info or spotify_info %}{% url 'download_page' %}{% else %}{% url 'Home_Page' %}{% endif %}"
+                  action="{% if not user_data.is_spotify_autherized %}{% url 'spotify_auth' %}
+                  {% elif not video_info or not spotify_info %}{% url 'Home_Page' %}
+                  {% else %}{% url 'download_page' %}
+                  {% endif %}"
                   class="needs-validation" novalidate>
                 {% csrf_token %}
-                <div class="form-floating mb-4 url-input-wrapper">
-                    <input type="url" id="videoLink" name="video_link"
-                           class="form-control form-control-lg border-2 focus-ring"
-                           placeholder="Enter URL" value="{{ url|default:'' }}"
-                    <input type="url" id="videoLink" name="video_link" 
-                           class="form-control form-control-lg border-2 focus-ring" 
-                           placeholder="Enter URL" value="{{ url|default:'' }}" 
-                           required autocomplete="off"
-                           data-bs-toggle="tooltip"
-                           data-bs-placement="top"
-                           data-bs-toggle="tooltip" 
-                           data-bs-placement="top" 
-                           pattern="https?:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*)"
-                           title="Paste your media URL here">
-                    <label for="videoLink" class="d-flex align-items-center">
-                        <i class="bi bi-link-45deg me-2 text-primary"></i>Enter Media URL
-                    </label>
-                    <div class="invalid-feedback">Please enter a valid URL starting with http:// or https://</div>
-                </div>
 
-                {% if video_info or spotify_info %}
-                <div class="card bg-light mb-4 border-0 animate__animated animate__fadeIn">
-                    <div class="card-body">
-                        <h5 class="card-title mb-3 d-flex align-items-center">
-                            <i class="bi bi-info-square-fill me-2 text-primary"></i>Media Details
-                        </h5>
-                        {% include 'Downloader/media_info_template.html' %}
-                    </div>
-                </div>
-                <div class="row g-4 animate__animated animate__fadeInUp">
-                    {% if video_info %}
-                    <div class="col-md-6">
-                        <div class="form-floating">
-                            <select id="mediaType" name="media_type"
-                            <select id="mediaType" name="media_type" 
-                                    class="form-select custom-select border-2" required>
-                                <option value="video">Video with Audio</option>
-                                <option value="audio">Audio Only (MP3)</option>
-                            </select>
-                            <label for="mediaType" class="text-secondary">Format</label>
-                        </div>
-                    </div>
-                    {% endif %}
-                    <div class="col-md-6">
-                        <div class="form-floating">
-                            <select id="quality" name="quality"
-                            <select id="quality" name="quality" 
-                                    class="form-select custom-select border-2" required>
-                            </select>
-                            <label for="quality" class="text-secondary">Quality</label>
-                        </div>
-                    </div>
-                    <div class="col-12">
-                        <div class="form-floating">
-                            <input type="text" id="customFilename" name="custom_filename"
-                            <input type="text" id="customFilename" name="custom_filename" 
-                                   class="form-control border-2"
-                                   placeholder="Custom filename (optional)">
-                            <label for="customFilename">Custom Filename (optional)</label>
-                        </div>
-                    </div>
-                    <div class="col-12">
-                        <div class="form-check form-switch custom-switch">
-                            <input class="form-check-input" type="checkbox"
-                            <input class="form-check-input" type="checkbox" 
-                                   id="createSubfolder" name="create_subfolder" checked>
-                            <label class="form-check-label ms-2" for="createSubfolder">
-                                Create organized subfolder structure
-                            </label>
-                        </div>
-                    </div>
-                </div>
-                <button type="submit" class="btn btn-primary btn-lg w-100 mt-4 download-btn" id="downloadButton">
-                    <i class="bi bi-download me-2"></i>Start Download
-                    <div class="progress download-progress d-none">
-                        <div class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar"></div>
-                    </div>
-                </button>
+                {% if not user_data.is_spotify_autherized %}
+                    <!-- Spotify Authorization Button -->
+                    <button type="submit" class="btn btn-primary btn-lg w-100 Auth-btn" id="authButton">
+                        <i class="bi bi-search me-2"></i>Authorize Spotify Account
+                    </button>
                 {% else %}
-                <button type="submit" class="btn btn-primary btn-lg w-100 fetch-btn" id="fetchInfoButton">
-                    <i class="bi bi-search me-2"></i>Fetch Media Info
-                </button>
+                    <!-- Form to fetch video info -->
+                    <div class="form-floating mb-4 url-input-wrapper">
+                        <input type="url" id="videoLink" name="video_link" 
+                               class="form-control form-control-lg border-2 focus-ring"
+                               placeholder="Enter URL" value="{{ url|default:'' }}"
+                               required autocomplete="off"
+                               data-bs-toggle="tooltip"
+                               data-bs-placement="top"
+                               pattern="https?:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*)"
+                               title="Paste your media URL here">
+                        <label for="videoLink" class="d-flex align-items-center">
+                            <i class="bi bi-link-45deg me-2 text-primary"></i>Enter Media URL
+                        </label>
+                        <div class="invalid-feedback">Please enter a valid URL starting with http:// or https://</div>
+                    </div>
+
+                    {% if not video_info or not spotify_info %}
+                        <!-- Fetch Media Info Button -->
+                        <p>Please authorize with Spotify first</p>
+                        <button type="submit" class="btn btn-primary btn-lg w-100 fetch-btn" id="fetchInfoButton">
+                            <i class="bi bi-search me-2"></i>Fetch Media Info
+                        </button>
+                    {% else %}
+                        <!-- Display Media Details -->
+                        <div class="card bg-light mb-4 border-0 animate__animated animate__fadeIn">
+                            <div class="card-body">
+                                <h5 class="card-title mb-3 d-flex align-items-center">
+                                    <i class="bi bi-info-square-fill me-2 text-primary"></i>Media Details
+                                </h5>
+                                {% include 'Downloader/media_info_template.html' %}
+                            </div>
+                        </div>
+
+                        <div class="row g-4 animate__animated animate__fadeInUp">
+                            {% if video_info %}
+                                <div class="col-md-6">
+                                    <div class="form-floating">
+                                        <select id="mediaType" name="media_type" class="form-select custom-select border-2" required>
+                                            <option value="video">Video with Audio</option>
+                                            <option value="audio">Audio Only (MP3)</option>
+                                        </select>
+                                        <label for="mediaType" class="text-secondary">Format</label>
+                                    </div>
+                                </div>
+                            {% endif %}
+
+                            <div class="col-md-6">
+                                <div class="form-floating">
+                                    <select id="quality" name="quality" class="form-select custom-select border-2" required>
+                                        <!-- Quality options will be filled dynamically -->
+                                    </select>
+                                    <label for="quality" class="text-secondary">Quality</label>
+                                </div>
+                            </div>
+
+                            <div class="col-12">
+                                <div class="form-floating">
+                                    <input type="text" id="customFilename" name="custom_filename" 
+                                           class="form-control border-2"
+                                           placeholder="Custom filename (optional)">
+                                    <label for="customFilename">Custom Filename (optional)</label>
+                                </div>
+                            </div>
+
+                            <div class="col-12">
+                                <div class="form-check form-switch custom-switch">
+                                    <input class="form-check-input" type="checkbox" id="createSubfolder" name="create_subfolder" checked>
+                                    <label class="form-check-label ms-2" for="createSubfolder">
+                                        Create organized subfolder structure
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Start Download Button -->
+                        <button type="submit" class="btn btn-primary btn-lg w-100 mt-4 download-btn" id="downloadButton">
+                            <i class="bi bi-download me-2"></i>Start Download
+                            <div class="progress download-progress d-none">
+                                <div class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar"></div>
+                            </div>
+                        </button>
+                    {% endif %}
                 {% endif %}
             </form>
         </div>
     </div>
 </div>
+
 
 <!-- Toast Notification -->
 <div class="position-fixed bottom-0 end-0 p-3" style="z-index: 1080">
@@ -140,19 +152,18 @@
             bitrates: {{ video_info.bitrates|default:"[]"|safe }},
             formats: {{ video_info.formats|default:"[]"|safe }}
         };
-    
+
         // Initialize Bootstrap tooltips
         const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
         tooltipTriggerList.forEach(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl));
-    
+
         // Update quality options when media type changes
         if (mediaTypeSelect) {
             mediaTypeSelect.addEventListener('change', () => updateQualityOptions(mediaTypeSelect.value));
             updateQualityOptions(mediaTypeSelect.value);
         }
-    
+
         form.addEventListener('submit', function(e) {
-            // Check if video_info or spotify_info is available to set target="_blank"
             if (isVideoOrSpotifyAvailable) {
                 form.target = '_blank';  // Open in a new tab if video or spotify info is available
             } else {
@@ -166,13 +177,24 @@
                 showValidationFeedback();
             } else if (form.id === 'fetchForm') {
                 handleFetchSubmit();
-            } else {
+            } else if (form.id === 'downloadForm') {
                 handleDownloadSubmit(e);
+            } else {
+                handleAuthSubmit();
             }
 
             form.classList.add('was-validated');
         });
-    
+
+        // Event listener for authorization button
+        document.getElementById('authButton').addEventListener('click', function() {
+            // The authorization URL you want to open
+            const authUrl = "https://accounts.spotify.com/authorize?response_type=code&client_id=b36e01c92fc24dc6a59ea167fd59ed13&scope=playlist-read-private%20playlist-read-collaborative&redirect_uri=http://localhost:8000/callback";
+
+            // Open the URL in a new tab
+            window.open(authUrl, '_blank');
+        });
+
         function updateQualityOptions(mediaType) {
             qualitySelect.innerHTML = '';
             let options = [];
@@ -215,6 +237,7 @@
             return 'Standard Quality';
         }
 
+        // Handle download submit
         async function handleDownloadSubmit(e) {
             const button = document.getElementById('downloadButton');
             showDownloadStarted();
@@ -229,30 +252,33 @@
                     headers: { 'X-Requested-With': 'XMLHttpRequest' }
                 });
 
-                console.log('Response:', response)
-                if (response.ok) throw new Error('Download failed. Please try again.')
-                    const Download_Link = await response.url
-                    window.open(Download_Link, "_blank");
-                
+                if (!response.ok) throw new Error('Download failed. Please try again.');
+
+                const downloadLink = await response.text();
+                window.open(downloadLink, "_blank");
             } catch (error) {
                 console.error('Error:', error);
-                showErrorToast('Download failed. Please try again.')
+                showErrorToast('Download failed. Please try again.');
             } finally {
-                downloadButton.disabled = false
+                button.disabled = false;
             }
+        }
 
+        // Handle authorization submit
+        async function handleAuthSubmit() {
+            const button = document.getElementById('AuthButton');
+            button.disabled = true;
+            button.innerHTML = '<div class="spinner-grow spinner-grow-sm me-2"></div>Fetching...';
+            try {
+                const response = await fetch('/authrization/');
+                const data = await response.json();
+                const authUrl = data.auth_url;
 
-                // if (response.bytes) {
-                //     const data = await response.clone();
-                //     updateDownloadProgress(data);
-                // } else {
-                //     throw new Error('Download failed');
-                // }
-            // } catch (error) {
-            //     showErrorToast('Download failed. Please try again.');
-            // } finally {
-            //     downloadButton.disabled = false;
-            // }
+                // Open the URL in a new tab
+                window.open(authUrl, '_blank');
+            } catch (error) {
+                console.error('Error fetching authentication URL:', error);
+            }
         }
 
         function handleFetchSubmit() {
@@ -265,26 +291,6 @@
             const downloadToast = new bootstrap.Toast(document.getElementById('downloadToast'));
             downloadToast.show();
             document.querySelector('.download-progress').classList.remove('d-none');
-        }
-
-        function updateDownloadProgress(data) {
-            progressBar.style.width = `${data.progress}%`;
-            document.getElementById('toastMessage').textContent = data.status;
-
-            if (data.progress < 100) {
-                setTimeout(() => checkProgress(data.taskId), 1000);
-            } else {
-                downloadComplete();
-            }
-        }
-
-        function downloadComplete() {
-            progressBar.style.width = '100%';
-            document.getElementById('toastMessage').textContent = 'Download complete!';
-            setTimeout(() => {
-                document.querySelector('.download-progress').classList.add('d-none');
-                progressBar.style.width = '0%';
-            }, 2000);
         }
 
         function showValidationFeedback() {
@@ -303,7 +309,8 @@
             toast.show();
         }
     });
-    </script>
+</script>
+
 
 
 <style>

@@ -1,13 +1,19 @@
-
+from django.shortcuts import redirect
+from django.http import HttpResponse, JsonResponse
+from registration.models import UserProfile
 from .Appsecurity import *
 import os
 import base64
 from requests import get, post
+from dotenv import load_dotenv
+
+
+load_dotenv()
 
 def generate_auth_url():
     """Generate Spotify authorization URL."""
     client_id = os.getenv('SPOTIFY_CLIENT_ID')
-    redirect_uri = os.getenv('SPOTIFY_REDIRECT_URI')
+    redirect_uri = "http://localhost:8000/callback"
     scope = "playlist-read-private playlist-read-collaborative"
 
     auth_url = (
@@ -22,7 +28,7 @@ def get_token_from_code(auth_code):
     """Exchange authorization code for access and refresh tokens."""
     client_id = sensitive_data['SPOTIFY_CLIENT_ID']
     client_secret = sensitive_data['SPOTIFY_CLIENT_SECRET']
-    redirect_uri = sensitive_data['SPOTIFY_REDIRECT_URI']
+    redirect_uri = 'http://localhost:8000/callback'
 
     url = "https://accounts.spotify.com/api/token"
     auth_string = client_id + ":" + client_secret
@@ -42,7 +48,7 @@ def get_token_from_code(auth_code):
 
     if response.status_code != 200:
         pass
-
+    print(response.json())
     return response.json()  # Contains 'access_token' and 'refresh_token'
 
 def get_token_from_refresh(refresh_token):
@@ -70,6 +76,95 @@ def get_token_from_refresh(refresh_token):
 
     return response.json()['access_token']
 
+def get_token(request, user_data):
+    if user_data.refresh_token:
+        # Use existing refresh token to get access token
+        print("from refresh")
+        access_token = get_token_from_refresh(user_data.refresh_token)
+    else:
+        # No refresh token exists, retrieve new tokens and save refresh token
+        print('new access')
+        my_data = retrieve_tokens(request)
+        print(my_data)
+        refresh_token = my_data.get('refresh_token')
+        access_token = my_data.get('access_token')
+        
+        # Save the new refresh token to the user's profile
+        user_data.refresh_token = refresh_token
+        user_data.save()
+    return access_token
+
+
+
+def start_authentication(request):
+    """Generate and return the Spotify authentication URL."""
+    auth_url = generate_auth_url()
+    return auth_url
+
+def authenticate_user(request):
+    """Start the Spotify authentication process."""
+    request.session.pop('auth_code', None)  # Clear any previous auth code
+    return start_authentication(request)
+
+def retrieve_tokens(request):
+    """Exchange the authorization code for tokens and save the refresh token."""
+    # Start the authentication process if not already done
+    if not request.session.get('auth_code'):
+        return authenticate_user(request)  # Redirect if no auth code is found
+    
+    code = request.session.get('auth_code')
+    print(code)
+    if not code:
+        return HttpResponse("Authorization code not found!", status=400)
+
+    try:
+        tokens = get_token_from_code(code)
+        print(tokens)
+        access_token = tokens['access_token']
+        refresh_token = tokens['refresh_token']
+        
+        # Save the refresh token to the user's profile
+        save_refresh_token(request.user, refresh_token)
+        
+        response_data = {
+            "access_token": access_token,
+            "refresh_token": refresh_token
+        }
+        print(response_data)
+        return JsonResponse(response_data)  # Returning as JSON
+        
+    except Exception as e:
+        return HttpResponse(f"Error retrieving tokens: {str(e)}", status=500)
+
+def spotify_callback(request):
+    """Handle the Spotify redirect and retrieve the authorization code."""
+    code = request.GET.get('code', None)
+    if code:
+        request.session['auth_code'] = code  # Store the code in the session
+        profile, created = UserProfile.objects.get_or_create(user=request.user)
+        profile.is_spotify_autherized = True
+        profile.save()
+
+        return redirect('Home_Page')
+    return HttpResponse("Authorization code not found!", status=400)
+
+def save_refresh_token(user, refresh_token):
+    """Save the refresh token to the UserProfile."""
+    profile, created = UserProfile.objects.get_or_create(user=user)
+    profile.refresh_token = refresh_token
+    profile.save()
+
+def get_refresh_token(user):
+    """Get the refresh token from the UserProfile."""
+    try:
+        profile = UserProfile.objects.get(user=user)
+        return profile.refresh_token
+    except UserProfile.DoesNotExist:
+        return None
+
+
+
+
 def get_auth_header(token):
     """Generate the authorization header."""
     return {"Authorization": f"Bearer {token}"}
@@ -90,26 +185,37 @@ def get_spotify_info_of(type, id, extra="", token=None):
 
 def get_spotify_track_info(track_id, access_token): 
     track = get_spotify_info_of("tracks", track_id, token=access_token)
+
     track_name = track['name']
     artist_name = track['artists'][0]['name']
+    
     return [{'track_name': track_name, 'artist_name': artist_name}]
 
 def get_spotify_album_tracks_info(album_id, access_token):
     """Fetch tracks from a Spotify album."""
-    album_name = get_spotify_info_of("albums", album_id, token=access_token)['name']
+    album_data = get_spotify_info_of("albums", album_id, token=access_token)
+
+    album_thumbnail = album_data['images'][0]['url']
+    album_name = album_data['name']
+
     album_tracks = get_spotify_info_of("albums", album_id, "tracks", token=access_token)
-    print(album_name)
-    return {'album_name':album_name, 'tracks':[
-        {'track_name': track['name'], 'artist_name': track['artists'][0]['name']}
+
+    return {'album_image': album_thumbnail, 'album_name':album_name, 'tracks':[
+        {'image_url': album_data['album']['images']['url'], 'track_name': track['name'], 'artist_name': track['artists'][0]['name']}
         for track in album_tracks['items']
     ]}
 
 def get_spotify_artist_top_tracks(artist_id, access_token):
     """Fetch all albums and their tracks for a Spotify artist."""
-    artist_name = get_spotify_info_of('artists', artist_id, token=access_token)['name']
+    my_data = get_spotify_info_of("albums", artist_id, token=access_token)
+
+    artist_thumbnail = my_data['images'][0]['url']
+    artist_name = my_data['name']
+    
     tracks = get_spotify_info_of('artists', artist_id, 'top-tracks', token=access_token)
+
     return {'artist':artist_name, 'tracks':[
-        {'track_name': track['name'], 'artist_name': track['artists'][0]['name']}
+        {'image_url': my_data['album']['images']['url'], 'track_name': track['name'], 'artist_name': track['artists'][0]['name'], "artist_thumbnail": artist_thumbnail}
         for track in tracks['tracks']
     ]}
 
@@ -122,8 +228,9 @@ def get_spotify_playlist_tracks(playlist_id, access_token):
 
     track_info = []
     for item in tracks['items']:
+        image = item['album']['images']['url']
         track_name = item['track']['name']
         artist_name = item['track']['artists'][0]['name']
-        track_info.append({'track_name': track_name, 'artist': artist_name})
+        track_info.append({'image_url': image, 'track_name': track_name, 'artist': artist_name})
 
     return {'playlist_name': playlist_name, 'tracks': track_info}

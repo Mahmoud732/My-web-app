@@ -35,25 +35,16 @@
     {% if spotify_info %}
     <div class="spotify-info">
         <div class="info-grid">
+            <div class="thumbnail">
+                <img src="{{ spotify_info.thumbnail }}" alt="Thumbnail" class="img-fluid">
+            </div>
             <div class="info-item">
                 <h6 class="text-muted">Title</h6>
-                <p class="info-text">{{ spotify_info.title }}</p>
+                <p class="info-text">{{ spotify_info.track_name }}</p>
             </div>
             <div class="info-item">
                 <h6 class="text-muted">Artist</h6>
-                <p class="info-text">{{ spotify_info.artist }}</p>
-            </div>
-            <div class="info-item">
-                <h6 class="text-muted">Album</h6>
-                <p class="info-text">{{ spotify_info.album }}</p>
-            </div>
-            <div class="info-item">
-                <h6 class="text-muted">Duration</h6>
-                <p class="info-text">{{ spotify_info.duration }}</p>
-            </div>
-            <div class="info-item">
-                <h6 class="text-muted">Release Date</h6>
-                <p class="info-text">{{ spotify_info.release_date|date:'Y-m-d' }}</p>
+                <p class="info-text">{{ spotify_info.artist_name }}</p>
             </div>
         </div>
         <div class="action-buttons mt-3">

@@ -1,6 +1,6 @@
 from django.shortcuts import get_object_or_404, render, redirect
 from django.contrib.auth.decorators import login_required
-from django.http import FileResponse, Http404
+from django.http import FileResponse, Http404, JsonResponse
 from django.contrib import messages
 from .Validations import (
     token_validity,
@@ -13,10 +13,8 @@ from .AppProcesses import (
     handle_spotify_download
 )
 from .Spotify_apis import (
-    get_token_from_refresh
-)
-from .AppServer import (
-    retrieve_tokens,
+    get_token,
+    retrieve_tokens
 )
 from .Youtube_apis import get_video_audio_format, download_video
 from .models import Media, Playlist
@@ -25,6 +23,15 @@ from checkout.models import Order
 from registration.models import UserProfile
 import os
 import re
+
+
+@login_required
+def Authorization_spotify(request):
+    if request.method == 'POST':
+        user_data = get_object_or_404(UserProfile, user=request.user)
+        auth_url = retrieve_tokens(request)
+        return JsonResponse({"auth_url":auth_url})
+    return render(request, 'downloader/InfoPage.html', {'user_data': user_data})
 
 
 @login_required
@@ -57,35 +64,12 @@ def browse_media(request, username, playlist_name):
     return render(request, 'downloader/browse_media.html', {'user': user, 'playlist': playlist, 'media_files': media_files})
 
 
-# Simplify token validation logic
-@login_required
-def is_validate_token(request, email, token):
-    validity = token_validity(email, token)
-    if not validity:
-        messages.error(request, "Invalid token. Please log in again.")
-        return False
-    return True
-
 def sanitize_filename(filename):
     return re.sub(r'[<>:"/\\|?*]', '', filename)
 
-def get_token(request, user_data):
-    if user_data.refresh_token:
-        # Use existing refresh token to get access token
-        access_token = get_token_from_refresh(user_data.refresh_token)
-    else:
-        # No refresh token exists, retrieve new tokens and save refresh token
-        my_data = retrieve_tokens(request)
-        refresh_token = my_data.get('refresh_token')
-        access_token = my_data.get('access_token')
-        
-        # Save the new refresh token to the user's profile
-        user_data.refresh_token = refresh_token
-        user_data.save()
-    return access_token
-
 @login_required
 def fetch_info(request):
+    user_data = get_object_or_404(UserProfile, user=request.user)
     if request.method == 'POST':
         try:
             url = request.POST.get('video_link')
@@ -110,6 +94,12 @@ def fetch_info(request):
             if is_valid_spotify_url(url):
                 access_token = get_token(request, user_data)
                 context = handle_spotify_url(url, access_token)
+                context = {
+                'user_data': user_data,
+                'spotify_info': context,
+                'url': url,
+                }
+                print(context)
                 return render(request, 'downloader/InfoPage.html', context)
 
             # Handle YouTube URLs as well
@@ -124,7 +114,7 @@ def fetch_info(request):
         except Exception as e:
             messages.error(request, f"Error fetching information: {e}")
             return redirect('login')
-    return render(request, 'downloader/InfoPage.html')
+    return render(request, 'downloader/InfoPage.html', {'user_data': user_data})
 
 
 @login_required
@@ -201,3 +191,13 @@ def download_file(request, file_path):
     except Exception as e:
         messages.error(request, f"Error downloading file: {str(e)}")
         return redirect('Home_Page')
+
+
+# Simplify token validation logic
+@login_required
+def is_validate_token(request, email, token):
+    validity = token_validity(email, token)
+    if not validity:
+        messages.error(request, "Invalid token. Please log in again.")
+        return False
+    return True
