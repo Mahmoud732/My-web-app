@@ -9,14 +9,13 @@ from .Validations import (
 from .AppProcesses import (
     audio_download_process,
     handle_spotify_url,
-    handle_youtube_url,
     handle_spotify_download
 )
 from .Spotify_apis import (
     get_token,
     retrieve_tokens
 )
-from .Youtube_apis import get_video_audio_format, download_video
+from .Youtube_apis import get_video_audio_format, download_video, handle_youtube_url
 from .models import Media, Playlist
 from django.contrib.auth.models import User
 from checkout.models import Order

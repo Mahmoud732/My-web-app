@@ -33,9 +33,39 @@ def search_youtube(request, query):
         return None
 
 
+def handle_youtube_url(url):
+    try:
+        ydl_opts = {
+            "cookies":"cookies.txt",
+            "noplaylist": True,
+            "format": "bestaudio/best",
+            "progress_hooks": [lambda d: print(f'Download Progress: {d["_percent_str"]}')]
+        }
+        with yt_dlp.YoutubeDL(ydl_opts) as ydl:
+            info = ydl.extract_info(url, download=False)
+            mp4_formats = [fmt for fmt in info['formats'] if fmt.get('height') and fmt.get('ext') == 'mp4']
+            resolutions = sorted(set(f"{fmt['height']}p" for fmt in mp4_formats), key=lambda res: int(res.replace("p", "")))
+            audio_formats = [fmt for fmt in info['formats'] if not fmt.get('height') and fmt.get('ext') == 'm4a']
+            bitrates = sorted(set(f"{int(fmt['abr'])} kbps" for fmt in audio_formats if fmt.get('abr')), key=lambda br: int(br.split()[0]))
+            return {
+                "thumbnail": info.get('thumbnail', None),
+                "duration": info['duration'],
+                "uploader": info['uploader'],
+                "channel_id": info['channel'],
+                "title": info['title'],
+                "description": info['description'],
+                "views": info['view_count'],
+                "upload_date": info['upload_date'],
+                "resolutions": resolutions if len(resolutions) > 0 else None,
+                "bitrates": bitrates if len(bitrates) > 0 else None,
+            }
+    except Exception as e:
+        return {"error": f"Error handling YouTube URL: {e}"}
+
+
 def get_audio_format(request, url):
     try:
-        with yt_dlp.YoutubeDL({'quiet': True}) as ydl:
+        with yt_dlp.YoutubeDL({"cookies":"cookies.txt", 'quiet': True}) as ydl:
             info = ydl.extract_info(url, download=False)
         
         audio_format = next((fmt for fmt in info['formats'] if fmt.get('acodec') != 'none'), None)
@@ -50,7 +80,7 @@ def get_audio_format(request, url):
 
 def get_video_audio_format(request, url, resolution):
     try:
-        with yt_dlp.YoutubeDL({'quiet': True}) as ydl:
+        with yt_dlp.YoutubeDL({"cookies":"cookies.txt", 'quiet': True}) as ydl:
             info = ydl.extract_info(url, download=False)
 
         video_format = next(
@@ -79,6 +109,7 @@ def download_audio(request, url, audio_format, dest, playlist):
         user_download_folder = os.path.join(settings.MEDIA_ROOT, dest, request.user.username)
 
         ydl_opts = {
+            "cookies":"cookies.txt",
             'format': f"{audio_format['format_id']}",
             'postprocessors': [
                 {
@@ -117,6 +148,7 @@ def download_video(request, url, resuloution, video_format, audio_format, dest):
         user_download_folder = os.path.join(settings.MEDIA_ROOT, dest, request.user.username)
 
         ydl_opts = {
+            "cookies":"cookies.txt",
             'format': f"{video_format['format_id']}+{audio_format['format_id']}",
             'merge_output_format': 'mp4',
             'outtmpl': f"{user_download_folder}/%(title)s - [%(height)s]p.%(ext)s",

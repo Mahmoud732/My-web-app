@@ -12,9 +12,7 @@ from .Validations import (
 from .Youtube_apis import search_youtube, download_audio, get_audio_format
 from .models import Playlist
 from django.contrib import messages
-import yt_dlp
 from asgiref.sync import sync_to_async
-import asyncio
 
 
 def handle_spotify_url(url, access_token):
@@ -38,33 +36,6 @@ def handle_spotify_url(url, access_token):
     except Exception as e:
         return {"error": f"Error handling Spotify URL: {e}"}
 
-def handle_youtube_url(url):
-    try:
-        ydl_opts = {
-            "noplaylist": True,
-            "format": "bestaudio/best",
-            "progress_hooks": [lambda d: print(f'Download Progress: {d["_percent_str"]}')]
-        }
-        with yt_dlp.YoutubeDL(ydl_opts) as ydl:
-            info = ydl.extract_info(url, download=False)
-            mp4_formats = [fmt for fmt in info['formats'] if fmt.get('height') and fmt.get('ext') == 'mp4']
-            resolutions = sorted(set(f"{fmt['height']}p" for fmt in mp4_formats), key=lambda res: int(res.replace("p", "")))
-            audio_formats = [fmt for fmt in info['formats'] if not fmt.get('height') and fmt.get('ext') == 'm4a']
-            bitrates = sorted(set(f"{int(fmt['abr'])} kbps" for fmt in audio_formats if fmt.get('abr')), key=lambda br: int(br.split()[0]))
-            return {
-                "thumbnail": info.get('thumbnail', None),
-                "duration": info['duration'],
-                "uploader": info['uploader'],
-                "channel_id": info['channel'],
-                "title": info['title'],
-                "description": info['description'],
-                "views": info['view_count'],
-                "upload_date": info['upload_date'],
-                "resolutions": resolutions if len(resolutions) > 0 else None,
-                "bitrates": bitrates if len(bitrates) > 0 else None,
-            }
-    except Exception as e:
-        return {"error": f"Error handling YouTube URL: {e}"}
 
 def handle_spotify_download(request, url, dest, access_token):
     try:
