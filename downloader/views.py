@@ -31,7 +31,7 @@ def Authorization_spotify(request):
         user_data = get_object_or_404(UserProfile, user=request.user)
         auth_url = retrieve_tokens(request)
         return JsonResponse({"auth_url":auth_url})
-    return render(request, 'downloader/InfoPage.html', {'user_data': user_data})
+    return render(request, 'Downloader/InfoPage.html', {'user_data': user_data})
 
 
 @login_required
@@ -53,7 +53,7 @@ def browse_playlists(request):
                 for media in playlist.media.all()
             ]
         })
-    return render(request, 'downloader/browse_playlists.html', {'playlists': data})
+    return render(request, 'Downloader/browse_playlists.html', {'playlists': data})
 
 
 def browse_media(request, username, playlist_name):
@@ -61,7 +61,7 @@ def browse_media(request, username, playlist_name):
     playlist = get_object_or_404(Playlist, user=user, title=playlist_name)
     media_files = Media.objects.filter(playlist=playlist)
     
-    return render(request, 'downloader/browse_media.html', {'user': user, 'playlist': playlist, 'media_files': media_files})
+    return render(request, 'Downloader/browse_media.html', {'user': user, 'playlist': playlist, 'media_files': media_files})
 
 
 def sanitize_filename(filename):
@@ -101,7 +101,7 @@ def fetch_info(request):
                 'url': url,
                 'quality': 'Ultra',
                 }
-                return render(request, 'downloader/InfoPage.html', context)
+                return render(request, 'Downloader/InfoPage.html', context)
 
             # Handle YouTube URLs as well
             video_info = handle_youtube_url(url)
@@ -111,12 +111,12 @@ def fetch_info(request):
                 'url': url,
             }
 
-            return render(request, 'downloader/InfoPage.html', context)
+            return render(request, 'Downloader/InfoPage.html', context)
 
         except Exception as e:
             messages.error(request, f"Error fetching information: {e}")
             return redirect('login')
-    return render(request, 'downloader/InfoPage.html', {'user_data': user_data})
+    return render(request, 'Downloader/InfoPage.html', {'user_data': user_data})
 
 
 @login_required
@@ -177,7 +177,7 @@ def handle_download(request):
 def success_page(request):
     # Add any logic to display after successful download
     messages.success(request, "Your download was successful!")
-    return render(request, 'downloader/success.html')  # Make sure this template exists
+    return render(request, 'Downloader/success.html')  # Make sure this template exists
 
 
 def download_file(request, file_path):
