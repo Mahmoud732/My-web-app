@@ -36,7 +36,7 @@ def search_youtube(request, query):
 def handle_youtube_url(url):
     try:
         ydl_opts = {
-            "cookies":"cookies.txt",
+            "cookiefile":"cookies.txt",
             "noplaylist": True,
             "format": "bestaudio/best",
             "progress_hooks": [lambda d: print(f'Download Progress: {d["_percent_str"]}')]
@@ -65,7 +65,7 @@ def handle_youtube_url(url):
 
 def get_audio_format(request, url):
     try:
-        with yt_dlp.YoutubeDL({"cookies":"cookies.txt", 'quiet': True}) as ydl:
+        with yt_dlp.YoutubeDL({"cookiefile":"cookies.txt", 'quiet': True}) as ydl:
             info = ydl.extract_info(url, download=False)
         
         audio_format = next((fmt for fmt in info['formats'] if fmt.get('acodec') != 'none'), None)
@@ -80,7 +80,7 @@ def get_audio_format(request, url):
 
 def get_video_audio_format(request, url, resolution):
     try:
-        with yt_dlp.YoutubeDL({"cookies":"cookies.txt", 'quiet': True}) as ydl:
+        with yt_dlp.YoutubeDL({"cookiefile":"cookies.txt", 'quiet': True}) as ydl:
             info = ydl.extract_info(url, download=False)
 
         video_format = next(
@@ -109,7 +109,7 @@ def download_audio(request, url, audio_format, dest, playlist):
         user_download_folder = os.path.join(settings.MEDIA_ROOT, dest, request.user.username)
 
         ydl_opts = {
-            "cookies":"cookies.txt",
+            "cookiefile":"cookies.txt",
             'format': f"{audio_format['format_id']}",
             'postprocessors': [
                 {
@@ -148,7 +148,7 @@ def download_video(request, url, resuloution, video_format, audio_format, dest):
         user_download_folder = os.path.join(settings.MEDIA_ROOT, dest, request.user.username)
 
         ydl_opts = {
-            "cookies":"cookies.txt",
+            "cookiefile":"cookies.txt",
             'format': f"{video_format['format_id']}+{audio_format['format_id']}",
             'merge_output_format': 'mp4',
             'outtmpl': f"{user_download_folder}/%(title)s - [%(height)s]p.%(ext)s",
