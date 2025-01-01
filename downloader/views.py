@@ -103,7 +103,7 @@ def fetch_info(request):
                 return render(request, 'Downloader/InfoPage.html', context)
 
             # Handle YouTube URLs as well
-            video_info = handle_youtube_url(url)
+            video_info = handle_youtube_url(request, url)
             context = {
                 'user_data': user_data,
                 'video_info': video_info,

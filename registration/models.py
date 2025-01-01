@@ -9,6 +9,7 @@ class UserProfile(models.Model):
     token = models.TextField(null=True, unique=True)
     refresh_token = models.TextField(null=True, unique=True)
     is_spotify_autherized = models.BooleanField(default=False)
+    # proxy = models.CharField(max_length=255, null=True, blank=True)  # New field for proxy
 
 
     def get_age(self):
@@ -19,6 +20,7 @@ class UserProfile(models.Model):
                 age -= 1
             return age
         return None
+    
 
     def __str__(self):
         return f'{self.user.username} ({self.user.email})'

@@ -15,7 +15,7 @@ from django.conf import settings
 from django.contrib.sites.shortcuts import get_current_site
 from .models import UserProfile
 from .forms import EditProfileForm
-
+    
 def signup_view(request):
     if request.method == 'POST':
         first_name = request.POST.get('first_name')
@@ -25,6 +25,7 @@ def signup_view(request):
         confirm_password = request.POST.get('confirm_password')
         email = request.POST.get('email')
         birthday = request.POST.get('birthday')
+        proxy_list = fetch_proxy_list()
         if not username or not password:
             messages.error(request, 'Username and password are required.')
             return render(request, 'registration/signup.html')
